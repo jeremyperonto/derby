@@ -59,14 +59,22 @@ export function CarBody({
       </mesh>
 
       {wheels.map((w, i) => (
-        <mesh
+        /* wrapper group spins about z (the axle direction); RaceCars drives it */
+        <group
           key={i}
           position={[w.x, AXLE_Y_IN + (w.raised ? RAISED_LIFT_IN : 0), w.z]}
-          rotation={[Math.PI / 2, 0, 0]}
+          userData={{ isWheel: true, raised: w.raised }}
         >
-          <cylinderGeometry args={[WHEEL_RADIUS_IN, WHEEL_RADIUS_IN, WHEEL_WIDTH_IN, 14]} />
-          <meshStandardMaterial color={wheelColor} flatShading roughness={0.9} />
-        </mesh>
+          <mesh rotation={[Math.PI / 2, 0, 0]}>
+            <cylinderGeometry args={[WHEEL_RADIUS_IN, WHEEL_RADIUS_IN, WHEEL_WIDTH_IN, 14]} />
+            <meshStandardMaterial color={wheelColor} flatShading roughness={0.9} />
+          </mesh>
+          {/* hub dot makes the spin visible */}
+          <mesh position={[WHEEL_RADIUS_IN * 0.55, 0, 0]} rotation={[Math.PI / 2, 0, 0]}>
+            <cylinderGeometry args={[0.09, 0.09, WHEEL_WIDTH_IN + 0.02, 8]} />
+            <meshStandardMaterial color={PALETTE.paper} flatShading />
+          </mesh>
+        </group>
       ))}
 
       {/* weight plugs, sunk into the flat bottom like drilled-and-filled holes */}

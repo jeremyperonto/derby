@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { sfx } from '../audio/audio'
 import { N, xAt } from '../carve/buffers'
 import {
   AXLE_X_IN,
@@ -36,8 +37,13 @@ export function WeightsView() {
   const onSlotTap = (slot: number) => {
     const result = togglePlug(slot, plugKind)
     if (result === 'overweight') {
+      sfx.honk()
       setBounce(true)
       setTimeout(() => setBounce(false), 700)
+    } else if (result === 'placed') {
+      sfx.plugIn()
+    } else {
+      sfx.plugOut()
     }
   }
 

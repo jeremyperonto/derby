@@ -1,4 +1,5 @@
 import type { CSSProperties, ReactNode } from 'react'
+import { sfx } from '../audio/audio'
 
 /**
  * Chunky retro-poster button — the one button of the game. Big touch
@@ -53,6 +54,7 @@ export function Btn({
         ...style,
       }}
       onPointerDown={(e) => {
+        if (!disabled) sfx.tap()
         const el = e.currentTarget
         el.style.transform = 'translateY(3px)'
         el.style.boxShadow = 'inset 0 2px 0 rgba(0,0,0,0.2)'

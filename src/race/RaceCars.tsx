@@ -14,7 +14,7 @@ export function RaceCars() {
   const lanes = useRaceStore((s) => s.lanes)
   const groups = useRef<(Group | null)[]>([])
 
-  useFrame(() => {
+  useFrame((_, delta) => {
     const { raceData, playback, track, finishPlayback } = useRaceStore.getState()
     if (!raceData) return
     const t = Math.max(0, playback.t)
@@ -31,6 +31,15 @@ export function RaceCars() {
       const pose = carPose(track, s, CAR_LENGTH_M)
       g.position.set(pose.x, pose.y + WHEEL_DROP_IN, laneZ(lane))
       g.rotation.z = pose.pitch
+
+      // spin the wheels to match ground speed (raised wheel stays still — kids notice)
+      const vInPerS = trace.v[i0]! / 0.0254
+      const spin = (vInPerS * delta * playback.timeScale) / 0.59 // ω = v/r
+      if (spin > 0) {
+        g.traverse((o) => {
+          if (o.userData.isWheel && !o.userData.raised) o.rotation.z -= spin
+        })
+      }
     }
 
     // hand off to results shortly after the last car (or timeout) finishes

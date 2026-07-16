@@ -1,4 +1,6 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { sfx } from '../audio/audio'
+import { speak } from '../audio/narration'
 import { LESSONS } from '../content/lessons'
 import { rivalById, RIVALS } from '../content/rivals'
 import { unlockById } from '../content/unlocks'
@@ -43,9 +45,29 @@ export function ResultsScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [raceData, rivalId])
 
-  if (!raceData || !outcome) return null
+  const lesson = outcome
+    ? outcome.tip
+      ? LESSONS[outcome.tip.lesson]
+      : LESSONS[outcome.rival.lesson]
+    : null
 
-  const lesson = outcome.tip ? LESSONS[outcome.tip.lesson] : LESSONS[outcome.rival.lesson]
+  // celebration + narration when the panel appears
+  useEffect(() => {
+    if (!outcome || !lesson) return
+    if (outcome.beatRival) {
+      sfx.fanfare()
+      speak(`You beat ${outcome.rival.name}!`)
+    } else {
+      sfx.womp()
+      const line = outcome.tip
+        ? LESSONS[outcome.tip.lesson].tipLine.replace('{gain}', lengthsPhrase(outcome.tip.gainLengths))
+        : lesson.kidLine
+      speak(`So close! Pit crew says: ${line}`)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [outcome])
+
+  if (!raceData || !outcome || !lesson) return null
 
   return (
     <div

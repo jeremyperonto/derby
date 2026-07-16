@@ -1,6 +1,8 @@
-import { useMemo } from 'react'
+import { useLayoutEffect, useMemo, useRef } from 'react'
+import { Color, InstancedMesh, Matrix4 } from 'three'
 import { PALETTE } from '../content/palette'
 import { IN_TO_M } from '../lib/math'
+import { mulberry32 } from '../sim/rng'
 import { useRaceStore } from '../state/raceStore'
 import {
   DECK_HALF_WIDTH_IN,
@@ -9,6 +11,8 @@ import {
   ribbonGeometry,
   surfaceAt,
 } from './trackGeometry'
+
+const FESTIVE = [PALETTE.brickRed, PALETTE.mustard, PALETTE.skyBlue, PALETTE.paper, PALETTE.orange]
 
 /**
  * Static race world: track deck + lane guide rails + gate/finish dressing +
@@ -95,7 +99,83 @@ export function TrackScene() {
         <circleGeometry args={[22, 20]} />
         <meshBasicMaterial color={PALETTE.mustard} />
       </mesh>
+
+      {/* county-fair dressing: bunting pennants + a crowd of simple folk */}
+      <Bunting />
+      <Crowd finishX={finish.x} groundY={groundY} />
     </group>
+  )
+}
+
+/** two strings of alternating pennant triangles along the flat run */
+function Bunting() {
+  const track = useRaceStore((s) => s.track)
+  const ref = useRef<InstancedMesh>(null)
+  const COUNT = 72
+
+  useLayoutEffect(() => {
+    const mesh = ref.current
+    if (!mesh) return
+    const m = new Matrix4()
+    const color = new Color()
+    for (let i = 0; i < COUNT; i++) {
+      const side = i % 2 === 0 ? -1 : 1
+      const s = 3.2 + (i >> 1) * 0.26
+      const p = surfaceAt(track, s)
+      // pennants hang point-down from an imaginary string, drooping between posts
+      m.makeRotationX(Math.PI)
+      m.setPosition(
+        p.x,
+        p.y + 17 - Math.abs(Math.sin((i >> 1) * 0.9)) * 1.4,
+        side * (DECK_HALF_WIDTH_IN + 5),
+      )
+      mesh.setMatrixAt(i, m)
+      mesh.setColorAt(i, color.set(FESTIVE[i % FESTIVE.length]!))
+    }
+    mesh.instanceMatrix.needsUpdate = true
+    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true
+  }, [track])
+
+  return (
+    <instancedMesh ref={ref} args={[undefined, undefined, COUNT]}>
+      <coneGeometry args={[0.5, 1.3, 3]} />
+      <meshBasicMaterial />
+    </instancedMesh>
+  )
+}
+
+/** blocky spectators clustered near the finish line */
+function Crowd({ finishX, groundY }: { finishX: number; groundY: number }) {
+  const ref = useRef<InstancedMesh>(null)
+  const COUNT = 36
+
+  useLayoutEffect(() => {
+    const mesh = ref.current
+    if (!mesh) return
+    const rng = mulberry32(7)
+    const m = new Matrix4()
+    const color = new Color()
+    for (let i = 0; i < COUNT; i++) {
+      const height = 3 + rng() * 2
+      m.makeScale(1, height / 4, 1)
+      // far side only — the finish camera films from the near side
+      m.setPosition(
+        finishX - 60 + rng() * 85,
+        groundY + height / 2,
+        -(DECK_HALF_WIDTH_IN + 8 + rng() * 16),
+      )
+      mesh.setMatrixAt(i, m)
+      mesh.setColorAt(i, color.set(FESTIVE[Math.floor(rng() * FESTIVE.length)]!))
+    }
+    mesh.instanceMatrix.needsUpdate = true
+    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true
+  }, [finishX, groundY])
+
+  return (
+    <instancedMesh ref={ref} args={[undefined, undefined, COUNT]}>
+      <capsuleGeometry args={[1.1, 2.4, 2, 6]} />
+      <meshStandardMaterial flatShading />
+    </instancedMesh>
   )
 }
 

@@ -13,7 +13,7 @@ npm run preview    # serve the production build locally
 
 ## Stack
 
-Vite + React + TypeScript + react-three-fiber + drei. State: zustand. Save validation: zod. Camera damping: maath. Audio: howler.
+Vite + React + TypeScript + react-three-fiber + drei. State: zustand. Save validation: zod. Camera damping: maath. Audio: Web Audio synth in `src/audio/audio.ts` — all SFX are generated oscillator/noise recipes, zero sound-asset files; iOS unlock on first pointer gesture.
 **Deliberately absent — do not add:** physics engines, CSG/mesh-boolean libraries, 2D clippers, routers, postprocessing, zustand/persist, zundo.
 
 ## Architecture rules (load-bearing — do not violate)

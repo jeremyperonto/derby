@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import { Vector3 } from 'three'
 import { damp3 } from 'maath/easing'
+import { sfx } from '../audio/audio'
 import { WHEEL_DROP_IN } from '../garage/CarBody'
 import { IN_TO_M } from '../lib/math'
 import { useRaceStore } from '../state/raceStore'
@@ -26,9 +27,13 @@ export function CameraRig() {
   const target = useRef(new Vector3())
   const lookAt = useRef(new Vector3())
   const initialized = useRef(false)
+  const cheered = useRef(false)
+  const snapped = useRef(false)
 
   useEffect(() => {
     initialized.current = false
+    cheered.current = false
+    snapped.current = false
     return () => {
       // hand the camera back to the garage/title framing
       camera.position.copy(GARAGE_CAM.position)
@@ -37,11 +42,32 @@ export function CameraRig() {
   }, [camera])
 
   useFrame((_, delta) => {
-    const { raceData, playback, track } = useRaceStore.getState()
+    const { raceData, playback, track, photoFinish, freezeFrame } = useRaceStore.getState()
     if (!raceData || playback.finished) return
+
+    const winnerTime = Math.min(...raceData.lanes.map((l) => l.finishTime))
+
+    // slow-mo: ease the clock toward 0.12× over the last stretch of a photo finish
+    if (photoFinish && !playback.frozen) {
+      const tickNow = Math.min(raceData.ticks - 1, Math.floor(Math.max(0, playback.t) / raceData.dt))
+      const lead = Math.max(...raceData.lanes.map((l) => l.s[tickNow]!))
+      const targetScale = lead > track.lengthM - 1.6 ? 0.12 : 1
+      playback.timeScale += (targetScale - playback.timeScale) * Math.min(1, delta * 4)
+      if (targetScale < 1 && !snapped.current) {
+        snapped.current = true
+        sfx.camera()
+      }
+    }
 
     // advance the race clock (clamped delta guards tab-switch jumps)
     playback.t += Math.min(delta, 1 / 20) * playback.timeScale
+
+    // the moment the winner crosses: cheer once; freeze if it's a photo finish
+    if (playback.t >= winnerTime && !cheered.current) {
+      cheered.current = true
+      sfx.cheer()
+      if (photoFinish) freezeFrame()
+    }
 
     const t = Math.max(0, playback.t)
     const tick = Math.min(raceData.ticks - 1, Math.floor(t / raceData.dt))

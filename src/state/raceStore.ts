@@ -29,6 +29,8 @@ export interface Playback {
   t: number
   playing: boolean
   timeScale: number
+  /** photo-finish freeze frame is being shown */
+  frozen: boolean
   /** set true once the results screen has been triggered */
   finished: boolean
 }
@@ -42,9 +44,12 @@ interface RaceState {
   attempt: number
   /** ladder rival this heat is against (null = practice race) */
   rivalId: string | null
+  /** top two finishers within 60 ms — trigger the slow-mo photo finish */
+  photoFinish: boolean
 
   startRace: (player: CarDesign, rivalId: string) => void
   rematch: () => void
+  freezeFrame: () => void
   finishPlayback: () => void
 }
 
@@ -57,9 +62,10 @@ export const useRaceStore = create<RaceState>((set, get) => ({
   lanes: [],
   laneParams: [],
   raceData: null,
-  playback: { t: 0, playing: false, timeScale: 1, finished: false },
+  playback: { t: 0, playing: false, timeScale: 1, frozen: false, finished: false },
   attempt: 0,
   rivalId: null,
+  photoFinish: false,
 
   startRace: (player, rivalId) => {
     const rival = rivalById(rivalId)
@@ -83,13 +89,16 @@ export const useRaceStore = create<RaceState>((set, get) => ({
     }))
     const laneParams = designs.map((d) => deriveSimParams(d).params)
     const raceData = runRace(laneParams, seed)
+    const sorted = raceData.lanes.map((l) => l.finishTime).sort((a, b) => a - b)
+    const photoFinish = Number.isFinite(sorted[1]!) && sorted[1]! - sorted[0]! < 0.06
     set({
       lanes,
       laneParams,
       raceData,
       attempt,
       rivalId,
-      playback: { t: -GATE_CEREMONY_S, playing: true, timeScale: 1, finished: false },
+      photoFinish,
+      playback: { t: -GATE_CEREMONY_S, playing: true, timeScale: 1, frozen: false, finished: false },
     })
     useAppStore.getState().setScreen('race')
   },
@@ -99,6 +108,14 @@ export const useRaceStore = create<RaceState>((set, get) => ({
     const player = lanes.find((l) => l.isPlayer)?.design
     if (!player || !rivalId) return
     get().startRace(player, rivalId)
+  },
+
+  freezeFrame: () => {
+    const { playback } = get()
+    if (playback.frozen || playback.finished) return
+    playback.timeScale = 0
+    set({ playback: { ...playback, frozen: true } })
+    setTimeout(() => get().finishPlayback(), 1800)
   },
 
   finishPlayback: () => {

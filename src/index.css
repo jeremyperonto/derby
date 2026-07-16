@@ -10,8 +10,32 @@
   --pine: #e6c98f;
   --forest: #4a6b4f;
 
+  --font-display: 'Alfa Slab One', 'Trebuchet MS', system-ui, serif;
+
   font-family: 'Trebuchet MS', 'Comic Sans MS', system-ui, sans-serif;
   color: var(--ink);
+}
+
+@keyframes photoflash {
+  0% {
+    opacity: 0.95;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-4px);
+  }
+  75% {
+    transform: translateX(4px);
+  }
 }
 
 * {

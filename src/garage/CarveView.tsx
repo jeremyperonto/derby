@@ -1,5 +1,6 @@
 import { useRef } from 'react'
 import type { PointerEvent } from 'react'
+import { sfx } from '../audio/audio'
 import { N, xAt } from '../carve/buffers'
 import {
   AXLE_X_IN,
@@ -89,6 +90,8 @@ export function CarveView() {
   const onUp = () => {
     if (!gesture.current) return
     gesture.current = null
+    if (tool === 'sand') sfx.sand()
+    else sfx.carve()
     commitDraft()
   }
 
