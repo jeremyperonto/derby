@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
+    <meta name="description" content="Derby Dash — carve a pinewood racer, race it in 3D, and learn the physics that make it fast." />
+    <meta name="theme-color" content="#F5EBD8" />
+    <title>Derby Dash 🏁</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script>
+      // surface swallowed startup errors (also helps debugging on tablets)
+      window.__errors = []
+      window.addEventListener('error', (e) => window.__errors.push(String(e.error?.stack || e.message)))
+      window.addEventListener('unhandledrejection', (e) => window.__errors.push('rejection: ' + String(e.reason?.stack || e.reason)))
+    </script>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

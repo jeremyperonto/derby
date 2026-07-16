@@ -1,0 +1,157 @@
+import { TEMPLATES } from '../content/templates'
+import { useAppStore } from '../state/appStore'
+import { useGarageStore, type CarveTool } from '../state/garageStore'
+import { Btn } from '../ui/Btn'
+import { CarveView } from './CarveView'
+
+/**
+ * Garage overlay UI (M2 scope: the carve station). Left card = 2D carve
+ * surface; the 3D preview shows through on the right. Weights/wheels/paint
+ * stations land in M4.
+ */
+
+const TOOLS: { id: CarveTool; icon: string; label: string }[] = [
+  { id: 'slice', icon: '🔪', label: 'Slice' },
+  { id: 'scoop', icon: '🥄', label: 'Scoop' },
+  { id: 'sand', icon: '🧽', label: 'Sand' },
+]
+
+export function GarageScreen() {
+  const setScreen = useAppStore((s) => s.setScreen)
+  const tool = useGarageStore((s) => s.tool)
+  const view = useGarageStore((s) => s.view)
+  const design = useGarageStore((s) => s.design)
+  const derived = useGarageStore((s) => s.derived)
+  const canUndo = useGarageStore((s) => s.design.carve.ops.length > 0)
+  const canRedo = useGarageStore((s) => s.redoStack.length > 0)
+  const { setTool, setView, undo, redo, resetBlock, applyTemplate, setEdgeRound } =
+    useGarageStore.getState()
+
+  const roundR = (() => {
+    const op = [...design.carve.ops].reverse().find((o) => o.t === 'round')
+    return op && op.t === 'round' ? op.r : 0
+  })()
+
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        inset: 0,
+        display: 'flex',
+        flexDirection: 'column',
+        pointerEvents: 'none',
+      }}
+    >
+      {/* top bar */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 10,
+          padding: '10px 14px',
+          pointerEvents: 'auto',
+        }}
+      >
+        <Btn variant="paper" onClick={() => setScreen('title')} title="back">
+          ⬅
+        </Btn>
+        <div
+          style={{
+            background: 'var(--navy)',
+            color: 'var(--paper)',
+            border: '3px solid var(--ink)',
+            borderRadius: 12,
+            padding: '8px 16px',
+            fontWeight: 800,
+          }}
+        >
+          🔨 {design.name} · #{design.number}
+        </div>
+        <div
+          style={{
+            background: derived.overweight ? 'var(--brick-red)' : 'var(--paper)',
+            color: derived.overweight ? 'var(--paper)' : 'var(--ink)',
+            border: '3px solid var(--ink)',
+            borderRadius: 12,
+            padding: '8px 16px',
+            fontWeight: 800,
+          }}
+        >
+          ⚖️ {derived.totalOz.toFixed(1)} / 5 oz
+        </div>
+        <div style={{ flex: 1 }} />
+        <Btn variant="mustard" onClick={undo} disabled={!canUndo} title="undo" style={{ fontSize: '1.4rem' }}>
+          ↩️ Undo
+        </Btn>
+        <Btn variant="paper" onClick={redo} disabled={!canRedo} title="redo">
+          ↪️
+        </Btn>
+      </div>
+
+      {/* main row: carve card on the left, 3D preview shows through on the right */}
+      <div style={{ flex: 1, display: 'flex', minHeight: 0 }}>
+        <div
+          style={{
+            width: 'min(58%, 720px)',
+            margin: '0 0 10px 14px',
+            display: 'flex',
+            flexDirection: 'column',
+            background: 'var(--paper)',
+            border: '3px solid var(--ink)',
+            borderRadius: 16,
+            boxShadow: '0 6px 0 var(--ink)',
+            padding: 12,
+            pointerEvents: 'auto',
+            gap: 10,
+          }}
+        >
+          <div style={{ display: 'flex', gap: 8 }}>
+            <Btn variant="paper" active={view === 'side'} onClick={() => setView('side')}>
+              🚗 Side
+            </Btn>
+            <Btn variant="paper" active={view === 'top'} onClick={() => setView('top')}>
+              🔝 Top
+            </Btn>
+            <div style={{ flex: 1 }} />
+            {TOOLS.map((t) => (
+              <Btn key={t.id} active={tool === t.id} onClick={() => setTool(t.id)} title={t.label}>
+                <span style={{ fontSize: '1.3rem' }}>{t.icon}</span> {t.label}
+              </Btn>
+            ))}
+          </div>
+
+          <div style={{ flex: 1, minHeight: 0 }}>
+            <CarveView />
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+            <span style={{ fontWeight: 800 }}>⭕ Round edges</span>
+            <input
+              type="range"
+              min={0}
+              max={0.4}
+              step={0.02}
+              value={roundR}
+              onChange={(e) => setEdgeRound(Number(e.target.value))}
+              style={{ width: 140 }}
+            />
+            <div style={{ flex: 1 }} />
+            {TEMPLATES.map((t) => (
+              <Btn key={t.id} variant="paper" onClick={() => applyTemplate(t.ops)} title={t.name}>
+                {t.icon} {t.name}
+              </Btn>
+            ))}
+            <Btn
+              variant="red"
+              onClick={() => {
+                if (confirm('Start over with a fresh block of pine?')) resetBlock()
+              }}
+            >
+              🪵 Fresh block
+            </Btn>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}

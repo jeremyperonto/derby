@@ -1,0 +1,54 @@
+:root {
+  --paper: #f5ebd8;
+  --kraft: #c9a876;
+  --ink: #211d16;
+  --navy: #27335a;
+  --brick-red: #bf3b2b;
+  --mustard: #d9a03f;
+  --sky-blue: #a9d3e0;
+  --orange: #dd7a33;
+  --pine: #e6c98f;
+  --forest: #4a6b4f;
+
+  font-family: 'Trebuchet MS', 'Comic Sans MS', system-ui, sans-serif;
+  color: var(--ink);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+body {
+  background: var(--paper);
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: none;
+}
+
+#root {
+  position: relative;
+}
+
+canvas {
+  display: block;
+  touch-action: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
