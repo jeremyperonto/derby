@@ -1,5 +1,6 @@
 import { useLayoutEffect, useMemo, useRef } from 'react'
-import { Color, InstancedMesh, Matrix4 } from 'three'
+import { useFrame } from '@react-three/fiber'
+import { Color, InstancedMesh, Matrix4, MeshBasicMaterial } from 'three'
 import { PALETTE } from '../content/palette'
 import { IN_TO_M } from '../lib/math'
 import { mulberry32 } from '../sim/rng'
@@ -100,9 +101,46 @@ export function TrackScene() {
         <meshBasicMaterial color={PALETTE.mustard} />
       </mesh>
 
+      {/* winner lane lights, like a real derby finish gantry */}
+      <FinishLights finishX={finish.x} finishY={finish.y} />
+
       {/* county-fair dressing: bunting pennants + a crowd of simple folk */}
       <Bunting />
       <Crowd finishX={finish.x} groundY={groundY} />
+    </group>
+  )
+}
+
+/**
+ * Per-lane lights under the finish crossbar. Real derby tracks announce the
+ * winner with an instant lane light — ours flashes the winner's lane the
+ * moment their nose crosses (and blinks, because kids).
+ */
+function FinishLights({ finishX, finishY }: { finishX: number; finishY: number }) {
+  const materials = useRef<(MeshBasicMaterial | null)[]>([])
+  const OFF = PALETTE.navy
+  const ON = PALETTE.mustard
+
+  useFrame(() => {
+    const { raceData, playback } = useRaceStore.getState()
+    if (!raceData) return
+    const winnerLane = raceData.order[0]!
+    const winnerTime = raceData.lanes[winnerLane]!.finishTime
+    const lit = Math.max(0, playback.t) >= winnerTime
+    for (let lane = 0; lane < LANE_COUNT; lane++) {
+      const material = materials.current[lane]
+      if (material) material.color.set(lane === winnerLane && lit ? ON : OFF)
+    }
+  })
+
+  return (
+    <group>
+      {Array.from({ length: LANE_COUNT }, (_, lane) => (
+        <mesh key={lane} position={[finishX, finishY + 11.4, laneZ(lane)]}>
+          <sphereGeometry args={[0.85, 10, 8]} />
+          <meshBasicMaterial ref={(el) => (materials.current[lane] = el)} color={OFF} />
+        </mesh>
+      ))}
     </group>
   )
 }

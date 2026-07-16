@@ -17,6 +17,8 @@ export interface Tuning {
   // --- integration ---
   dt: number
   maxSimTimeS: number
+  /** cars keep coasting this far past the line (finish times unaffected) */
+  coastPastFinishM: number
 
   // --- world ---
   gravity: number
@@ -66,6 +68,7 @@ export const TUNING: Tuning = {
 
   dt: 1 / 240,
   maxSimTimeS: 15,
+  coastPastFinishM: 1.8,
 
   gravity: 9.81,
   airDensity: 1.2,

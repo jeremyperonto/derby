@@ -33,6 +33,20 @@ describe('track', () => {
   })
 })
 
+describe('runout coast', () => {
+  it('cars keep rolling past the line; finish times are recorded at the crossing', () => {
+    const noWobble = { ...TUNING, wobble: 0 }
+    const race = runRace([p('wedgeRacer')], SEED, noWobble)
+    const lane = race.lanes[0]!
+    const finalS = lane.s[race.ticks - 1]!
+    expect(finalS).toBeGreaterThan(TUNING.trackLengthM + TUNING.coastPastFinishM * 0.9)
+    // the recorded finish time still corresponds to crossing the line itself
+    const tickAtFinish = Math.floor(lane.finishTime / TUNING.dt)
+    expect(lane.s[tickAtFinish]!).toBeLessThanOrEqual(TUNING.trackLengthM + 0.03)
+    expect(lane.s[tickAtFinish + 2]!).toBeGreaterThan(TUNING.trackLengthM - 0.05)
+  })
+})
+
 describe('determinism', () => {
   it('same cars + same seed → bit-identical race', () => {
     const cars = [p('wedgeRacer'), p('brick'), p('squeakyWedge'), p('noseWedge')]

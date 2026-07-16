@@ -29,6 +29,10 @@ export interface Playback {
   t: number
   playing: boolean
   timeScale: number
+  /** 'live' = the race itself; 'replay' = the automatic slow-mo second look */
+  phase: 'live' | 'replay'
+  /** the instant replay has already run once */
+  replayed: boolean
   /** photo-finish freeze frame is being shown */
   frozen: boolean
   /** set true once the results screen has been triggered */
@@ -50,8 +54,15 @@ interface RaceState {
   startRace: (player: CarDesign, rivalId: string) => void
   rematch: () => void
   freezeFrame: () => void
+  startReplay: () => void
   finishPlayback: () => void
 }
+
+/** instant-replay window: rewind this far before the winner's crossing… */
+export const REPLAY_REWIND_S = 0.75
+/** …and run until this long after it, at REPLAY_SPEED */
+export const REPLAY_TAIL_S = 0.5
+export const REPLAY_SPEED = 0.35
 
 const GATE_CEREMONY_S = 1.6
 export const PLAYER_LANE = 1
@@ -62,7 +73,15 @@ export const useRaceStore = create<RaceState>((set, get) => ({
   lanes: [],
   laneParams: [],
   raceData: null,
-  playback: { t: 0, playing: false, timeScale: 1, frozen: false, finished: false },
+  playback: {
+    t: 0,
+    playing: false,
+    timeScale: 1,
+    phase: 'live',
+    replayed: false,
+    frozen: false,
+    finished: false,
+  },
   attempt: 0,
   rivalId: null,
   photoFinish: false,
@@ -98,7 +117,15 @@ export const useRaceStore = create<RaceState>((set, get) => ({
       attempt,
       rivalId,
       photoFinish,
-      playback: { t: -GATE_CEREMONY_S, playing: true, timeScale: 1, frozen: false, finished: false },
+      playback: {
+        t: -GATE_CEREMONY_S,
+        playing: true,
+        timeScale: 1,
+        phase: 'live',
+        replayed: false,
+        frozen: false,
+        finished: false,
+      },
     })
     useAppStore.getState().setScreen('race')
   },
@@ -115,7 +142,24 @@ export const useRaceStore = create<RaceState>((set, get) => ({
     if (playback.frozen || playback.finished) return
     playback.timeScale = 0
     set({ playback: { ...playback, frozen: true } })
-    setTimeout(() => get().finishPlayback(), 1800)
+    // after the freeze-frame beat, roll the instant replay (then results)
+    setTimeout(() => {
+      if (get().playback.replayed) get().finishPlayback()
+      else get().startReplay()
+    }, 1800)
+  },
+
+  startReplay: () => {
+    const { playback, raceData } = get()
+    if (!raceData || playback.replayed || playback.finished) return
+    const winnerTime = Math.min(...raceData.lanes.map((l) => l.finishTime))
+    if (!Number.isFinite(winnerTime)) {
+      get().finishPlayback()
+      return
+    }
+    playback.t = Math.max(0, winnerTime - REPLAY_REWIND_S)
+    playback.timeScale = REPLAY_SPEED
+    set({ playback: { ...playback, phase: 'replay', replayed: true, frozen: false } })
   },
 
   finishPlayback: () => {

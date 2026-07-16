@@ -58,6 +58,8 @@ export function runRace(
     s: number
     v: number
     finished: boolean
+    /** finished AND coasted past the runout — stop integrating */
+    done: boolean
     finishTime: number
     finishSpeed: number
     wobbleMu: number
@@ -68,6 +70,7 @@ export function runRace(
     s: 0,
     v: 0,
     finished: false,
+    done: false,
     finishTime: Infinity,
     finishSpeed: 0,
     // per-race, per-lane friction noise — the only randomness in a heat
@@ -83,7 +86,7 @@ export function runRace(
       const car = cars[lane]!
       sim.trace.s[tick] = sim.s
       sim.trace.v[tick] = sim.v
-      if (sim.finished) continue
+      if (sim.done) continue
       allDone = false
 
       const mEff = car.massKg + car.spinningWheels * car.wheelIOverR2Kg
@@ -111,6 +114,10 @@ export function runRace(
         sim.finishTime = (tick + frac) * dt
         sim.finishSpeed = vNext
         sim.finished = true
+      }
+      // keep rolling through the runout past the line, then stop
+      if (sNext >= S + t.coastPastFinishM || vNext === 0) {
+        if (sim.finished) sim.done = true
       }
       sim.v = vNext
       sim.s = sNext

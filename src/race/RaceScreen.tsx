@@ -41,6 +41,34 @@ export function RaceScreen() {
           GO! 🏁
         </CenterText>
       )}
+      {playback.phase === 'replay' && !playback.frozen && (
+        <div
+          style={{
+            position: 'absolute',
+            top: '7vh',
+            left: 0,
+            right: 0,
+            display: 'flex',
+            justifyContent: 'center',
+          }}
+        >
+          <div
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: 'clamp(1.4rem, 4.5vw, 2.6rem)',
+              color: 'var(--paper)',
+              background: 'var(--brick-red)',
+              border: '4px solid var(--ink)',
+              borderRadius: 14,
+              boxShadow: '0 6px 0 var(--ink)',
+              padding: '8px 22px',
+              transform: 'rotate(-2deg)',
+            }}
+          >
+            📼 LET&apos;S SEE THAT AGAIN!
+          </div>
+        </div>
+      )}
       {playback.frozen && (
         <>
           {/* camera-flash wash */}
