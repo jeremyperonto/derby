@@ -1,8 +1,18 @@
 import { TEMPLATES } from '../content/templates'
+import { TEST_CARS } from '../content/testCars'
+import type { CarDesign } from '../model/carDesign'
 import { useAppStore } from '../state/appStore'
 import { useGarageStore, type CarveTool } from '../state/garageStore'
+import { useRaceStore } from '../state/raceStore'
 import { Btn } from '../ui/Btn'
 import { CarveView } from './CarveView'
+
+/** interim opponents until the rivals ladder lands (M5) */
+export const PRACTICE_RIVALS: CarDesign[] = [
+  { ...TEST_CARS.brickRacer!, paint: { body: 'navy', wheels: 'ink' } },
+  { ...TEST_CARS.squeakyWedge!, paint: { body: 'mustard', wheels: 'ink' } },
+  { ...TEST_CARS.noseWedge!, paint: { body: 'forest', wheels: 'ink' } },
+]
 
 /**
  * Garage overlay UI (M2 scope: the carve station). Left card = 2D carve
@@ -85,6 +95,13 @@ export function GarageScreen() {
         </Btn>
         <Btn variant="paper" onClick={redo} disabled={!canRedo} title="redo">
           ↪️
+        </Btn>
+        <Btn
+          variant="red"
+          onClick={() => useRaceStore.getState().startRace(design, PRACTICE_RIVALS)}
+          style={{ fontSize: '1.25rem' }}
+        >
+          🏁 RACE!
         </Btn>
       </div>
 

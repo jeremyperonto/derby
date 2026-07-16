@@ -5,6 +5,11 @@ import { TitleScreen } from './app/TitleScreen'
 import { PALETTE } from './content/palette'
 import { GarageScene } from './garage/GarageScene'
 import { GarageScreen } from './garage/GarageScreen'
+import { CameraRig } from './race/CameraRig'
+import { RaceCars } from './race/RaceCars'
+import { RaceScreen } from './race/RaceScreen'
+import { TrackScene } from './race/TrackScene'
+import { ResultsScreen } from './results/ResultsScreen'
 import { useAppStore } from './state/appStore'
 
 const TuningPanel = lazy(() => import('./app/TuningPanel'))
@@ -39,6 +44,13 @@ function SceneRouter() {
       <directionalLight position={[4, 8, 6]} intensity={1.2} />
       {(screen === 'title' || screen === 'tuning') && <TitleBlock />}
       {screen === 'garage' && <GarageScene />}
+      {(screen === 'race' || screen === 'results') && (
+        <>
+          <TrackScene />
+          <RaceCars />
+          <CameraRig />
+        </>
+      )}
     </>
   )
 }
@@ -59,6 +71,8 @@ export default function App() {
 
       {screen === 'title' && <TitleScreen />}
       {screen === 'garage' && <GarageScreen />}
+      {screen === 'race' && <RaceScreen />}
+      {screen === 'results' && <ResultsScreen />}
       {screen === 'tuning' && (
         <Suspense fallback={null}>
           <TuningPanel />
