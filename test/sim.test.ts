@@ -125,6 +125,6 @@ describe('golden times (lock the physics — update DELIBERATELY after retunes)'
     const cars = [p('wedgeRacer'), p('brick'), p('squeakyWedge'), p('brickRacer')]
     const race = runRace(cars, SEED)
     const times = race.lanes.map((l) => Number(l.finishTime.toFixed(6)))
-    expect(times).toEqual([3.255556, 3.588716, 3.33976, 3.293888])
+    expect(times).toEqual([3.285458, 3.588716, 3.371827, 3.321042])
   })
 })

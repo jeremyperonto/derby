@@ -1,8 +1,9 @@
 import { DECALS, SLOT_LABELS } from '../content/decals'
 import { generateCarName } from '../content/names'
-import { CAR_PAINTS, PALETTE, type PaletteId } from '../content/palette'
+import { PALETTE, type PaletteId } from '../content/palette'
 import { DECAL_SLOTS } from '../model/carDesign'
 import { useGarageStore } from '../state/garageStore'
+import { useProgressStore } from '../state/progressStore'
 import { Btn } from '../ui/Btn'
 
 /**
@@ -11,29 +12,38 @@ import { Btn } from '../ui/Btn'
  */
 export function PaintView() {
   const design = useGarageStore((s) => s.design)
+  const unlockedCount = useProgressStore((s) => s.unlocked.length) // re-render on unlocks
   const { setPaint, setNumber, setName, setDecal, clearDecal } = useGarageStore.getState()
+  const { availablePaints, availableDecals } = useProgressStore.getState()
+
+  void unlockedCount
+  const paints = availablePaints()
+  const decals = DECALS.filter((d) => availableDecals().includes(d.id))
 
   const cycleDecal = (slot: (typeof DECAL_SLOTS)[number]) => {
     const current = design.decals.find((d) => d.slot === slot)?.decalId
-    const i = DECALS.findIndex((d) => d.id === current)
+    const i = decals.findIndex((d) => d.id === current)
     const next = i + 1
-    if (next >= DECALS.length) clearDecal(slot)
-    else setDecal({ slot, decalId: DECALS[next]!.id })
+    if (next >= decals.length) clearDecal(slot)
+    else setDecal({ slot, decalId: decals[next]!.id })
   }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16, padding: '6px 4px', overflowY: 'auto' }}>
       <div>
-        <div style={{ fontWeight: 900, marginBottom: 6 }}>🎨 Body paint</div>
-        <SwatchRow
-          selected={design.paint.body}
-          onPick={(body) => setPaint({ body })}
-        />
+        <div style={{ fontWeight: 900, marginBottom: 6 }}>
+          🎨 Body paint{' '}
+          <span style={{ fontWeight: 600, fontSize: '0.85rem', color: 'var(--navy)' }}>
+            (beat rivals to win more colors!)
+          </span>
+        </div>
+        <SwatchRow paints={paints} selected={design.paint.body} onPick={(body) => setPaint({ body })} />
       </div>
 
       <div>
         <div style={{ fontWeight: 900, marginBottom: 6 }}>🛞 Wheel paint</div>
         <SwatchRow
+          paints={[...paints, 'ink']}
           selected={design.paint.wheels}
           onPick={(wheels) => setPaint({ wheels })}
         />
@@ -99,7 +109,7 @@ export function PaintView() {
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           {DECAL_SLOTS.map((slot) => {
             const current = design.decals.find((d) => d.slot === slot)
-            const glyph = DECALS.find((d) => d.id === current?.decalId)?.glyph
+            const glyph = decals.find((d) => d.id === current?.decalId)?.glyph
             return (
               <Btn key={slot} variant="paper" onClick={() => cycleDecal(slot)}>
                 <span style={{ fontSize: '1.5rem' }}>{glyph ?? '➕'}</span>
@@ -114,15 +124,17 @@ export function PaintView() {
 }
 
 function SwatchRow({
+  paints,
   selected,
   onPick,
 }: {
+  paints: PaletteId[]
   selected: PaletteId
   onPick: (id: PaletteId) => void
 }) {
   return (
     <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-      {CAR_PAINTS.map((id) => (
+      {[...new Set(paints)].map((id) => (
         <button
           key={id}
           onClick={() => onPick(id)}

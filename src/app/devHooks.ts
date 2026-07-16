@@ -44,12 +44,14 @@ export function installDevHooks(): void {
       if (template) useGarageStore.getState().applyTemplate(template.ops)
     }
     if (params.has('race')) {
-      const [{ useGarageStore }, { useRaceStore }, { PRACTICE_RIVALS }] = await Promise.all([
+      const [{ useGarageStore }, { useRaceStore }] = await Promise.all([
         import('../state/garageStore'),
         import('../state/raceStore'),
-        import('../garage/GarageScreen'),
       ])
-      useRaceStore.getState().startRace(useGarageStore.getState().design, PRACTICE_RIVALS)
+      const rivalId = params.get('race') || 'bobby'
+      useRaceStore
+        .getState()
+        .startRace(useGarageStore.getState().design, rivalId === '1' ? 'bobby' : rivalId)
     }
   }, 50)
 

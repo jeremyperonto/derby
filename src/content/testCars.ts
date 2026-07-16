@@ -21,20 +21,16 @@ function car(
   }
 }
 
-/** rear-loaded plugs: 2 tungsten in the rearmost centerline slots + bumpers */
+/** rear-loaded plugs (wedge body ≈ 2.1 oz + wheels ⇒ ~4.8 oz total, race-legal) */
 const REAR_PLUGS: WeightPlug[] = [
   { slot: 6, kind: 'tungsten' }, // x=6.45
   { slot: 5, kind: 'tungsten' }, // x=5.5
-  { slot: 7, kind: 'steel' }, // rear bumper
-  { slot: 8, kind: 'steel' }, // rear bumper
 ]
 
 /** same total mass, jammed in the nose */
 const NOSE_PLUGS: WeightPlug[] = [
   { slot: 0, kind: 'tungsten' }, // x=0.75
   { slot: 1, kind: 'tungsten' }, // x=1.7
-  { slot: 2, kind: 'steel' },
-  { slot: 2, kind: 'steel' }, // doubled slot is fine for test purposes
 ]
 
 const FULL_PREP = { raised: 'none', polish: 3, graphite: 3 } as const
@@ -81,6 +77,25 @@ export const TEST_CARS: Record<string, CarDesign> = {
   triWheel: car('t-triwheel', 'Tri-Wheel', {
     carve: { ops: wedgeOps },
     weights: REAR_PLUGS,
+    wheels: { ...FULL_PREP, raised: 'frontLeft' },
+  }),
+
+  /** a mastery build: low + slim + rounded, max legal rear weight, everything applied */
+  champion: car('t-champion', 'The Champion', {
+    carve: {
+      ops: [
+        { t: 'slice', view: 'side', ax: 0, ay: 0.3, bx: 7, by: 0.9 },
+        { t: 'slice', view: 'top', ax: 0, ay: 0.55, bx: 7, by: 0.875 },
+        { t: 'round', r: 0.25 },
+      ],
+    },
+    weights: [
+      { slot: 6, kind: 'tungsten' },
+      { slot: 5, kind: 'tungsten' },
+      { slot: 7, kind: 'steel' },
+      { slot: 8, kind: 'steel' },
+      { slot: 4, kind: 'steel' },
+    ],
     wheels: { ...FULL_PREP, raised: 'frontLeft' },
   }),
 }

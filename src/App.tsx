@@ -8,6 +8,7 @@ import { GarageScreen } from './garage/GarageScreen'
 import { CameraRig } from './race/CameraRig'
 import { RaceCars } from './race/RaceCars'
 import { RaceScreen } from './race/RaceScreen'
+import { RivalSelectScreen } from './race/RivalSelectScreen'
 import { TrackScene } from './race/TrackScene'
 import { ResultsScreen } from './results/ResultsScreen'
 import { useAppStore } from './state/appStore'
@@ -71,6 +72,7 @@ export default function App() {
 
       {screen === 'title' && <TitleScreen />}
       {screen === 'garage' && <GarageScreen />}
+      {screen === 'rivalSelect' && <RivalSelectScreen />}
       {screen === 'race' && <RaceScreen />}
       {screen === 'results' && <ResultsScreen />}
       {screen === 'tuning' && (
