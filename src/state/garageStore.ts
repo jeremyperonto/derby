@@ -12,10 +12,11 @@ import {
   type WheelSetup,
 } from '../model/carDesign'
 import { deriveSimParams, type DerivedCar } from '../model/deriveSimParams'
+import * as storage from '../lib/storage'
 
 export type CarveTool = 'slice' | 'scoop' | 'sand'
 export type CarveViewSide = 'side' | 'top'
-export type GarageStation = 'carve' | 'weights' | 'wheels' | 'paint'
+export type GarageStation = 'carve' | 'weights' | 'wheels' | 'paint' | 'cars'
 
 interface GarageState {
   design: CarDesign
@@ -48,9 +49,11 @@ interface GarageState {
   setPaint: (patch: Partial<CarDesign['paint']>) => void
   setNumber: (n: number) => void
   setName: (name: string) => void
-  addDecal: (decal: DecalPlacement) => void
-  removeLastDecal: () => void
+  setDecal: (decal: DecalPlacement) => void
+  clearDecal: (slot: DecalPlacement['slot']) => void
   loadDesign: (design: CarDesign) => void
+  newCar: () => void
+  deleteCar: (id: string) => void
 }
 
 function recompute(design: CarDesign, draftOp: CarveOp | null) {
@@ -65,11 +68,17 @@ function withOps(design: CarDesign, ops: CarveOp[]): CarDesign {
 }
 
 export const useGarageStore = create<GarageState>((set, get) => {
-  const initial = freshCarDesign(crypto.randomUUID(), Date.now())
+  // boot with the last active saved car, or a fresh block
+  const saved = storage.getDoc()
+  const initial =
+    saved.cars.find((c) => c.id === saved.activeCarId) ??
+    saved.cars[0] ??
+    freshCarDesign(crypto.randomUUID(), Date.now())
 
   const apply = (design: CarDesign, extra: Partial<GarageState> = {}) => {
     const draftOp = extra.draftOp !== undefined ? extra.draftOp : null
     set({ design, draftOp, ...recompute(design, draftOp), ...extra })
+    storage.upsertCar(design) // debounced write inside storage
   }
 
   return {
@@ -156,15 +165,29 @@ export const useGarageStore = create<GarageState>((set, get) => {
       const { design } = get()
       apply({ ...design, name: name.slice(0, 40) })
     },
-    addDecal: (decal) => {
+    setDecal: (decal) => {
       const { design } = get()
-      if (design.decals.length >= 8) return
-      apply({ ...design, decals: [...design.decals, decal] })
+      const decals = design.decals.filter((d) => d.slot !== decal.slot)
+      decals.push(decal)
+      apply({ ...design, decals })
     },
-    removeLastDecal: () => {
+    clearDecal: (slot) => {
       const { design } = get()
-      apply({ ...design, decals: design.decals.slice(0, -1) })
+      apply({ ...design, decals: design.decals.filter((d) => d.slot !== slot) })
     },
     loadDesign: (design) => apply(design, { redoStack: [] }),
+    newCar: () => {
+      apply(freshCarDesign(crypto.randomUUID(), Date.now()), { redoStack: [], station: 'carve' })
+    },
+    deleteCar: (id) => {
+      storage.deleteCar(id)
+      const { design } = get()
+      if (design.id === id) {
+        const next = storage.getDoc().cars[0] ?? freshCarDesign(crypto.randomUUID(), Date.now())
+        apply(next, { redoStack: [] })
+      } else {
+        set({}) // poke subscribers so the car wall refreshes
+      }
+    },
   }
 })

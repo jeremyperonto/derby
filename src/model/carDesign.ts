@@ -93,12 +93,13 @@ export type WheelSetup = z.infer<typeof wheelSetupSchema>
 
 const paletteId = z.custom<PaletteId>((v) => typeof v === 'string')
 
+/** sticker spots a kid can tap — fixed slots keep placement one-tap simple */
+export const DECAL_SLOTS = ['hood', 'roof', 'sideFront', 'sideRear', 'tail'] as const
+export type DecalSlot = (typeof DECAL_SLOTS)[number]
+
 export const decalPlacementSchema = z.object({
+  slot: z.enum(DECAL_SLOTS),
   decalId: z.string(),
-  u: z.number().min(0).max(1),
-  v: z.number().min(0).max(1),
-  scale: z.number().positive(),
-  rotationDeg: z.number(),
 })
 export type DecalPlacement = z.infer<typeof decalPlacementSchema>
 
@@ -117,7 +118,7 @@ export const carDesignSchema = z.object({
     accent: paletteId.optional(),
     wheels: paletteId,
   }),
-  decals: z.array(decalPlacementSchema).max(8),
+  decals: z.array(decalPlacementSchema).max(DECAL_SLOTS.length),
   thumbnail: z.string().optional(),
 })
 export type CarDesign = z.infer<typeof carDesignSchema>

@@ -3,6 +3,7 @@ import { replayOps } from '../carve/replay'
 import type { CarveBuffers } from '../carve/buffers'
 import type { CarDesign } from '../model/carDesign'
 import { deriveSimParams } from '../model/deriveSimParams'
+import { recordBestTime } from '../lib/storage'
 import { runRace, type RaceData } from '../sim/simulate'
 import { buildTrack, type Track } from '../sim/track'
 import { useAppStore } from './appStore'
@@ -78,8 +79,13 @@ export const useRaceStore = create<RaceState>((set, get) => ({
   },
 
   finishPlayback: () => {
-    const { playback } = get()
+    const { playback, lanes, raceData } = get()
     if (playback.finished) return
+    const playerLane = lanes.findIndex((l) => l.isPlayer)
+    const playerTime = raceData?.lanes[playerLane]?.finishTime
+    if (playerTime !== undefined && Number.isFinite(playerTime)) {
+      recordBestTime(lanes[playerLane]!.design.id, playerTime)
+    }
     set({ playback: { ...playback, finished: true } })
     useAppStore.getState().setScreen('results')
   },

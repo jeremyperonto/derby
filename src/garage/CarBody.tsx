@@ -3,7 +3,13 @@ import type { CarveBuffers } from '../carve/buffers'
 import { idxAt } from '../carve/buffers'
 import { loftGeometry } from '../carve/loft'
 import { PALETTE } from '../content/palette'
-import { AXLE_X_IN, WEIGHT_SLOTS, type CarDesign } from '../model/carDesign'
+import {
+  AXLE_X_IN,
+  WEIGHT_SLOTS,
+  type CarDesign,
+  type DecalSlot,
+} from '../model/carDesign'
+import { decalTexture, numberTexture } from './carDecals'
 
 /**
  * The one car renderer, shared by garage preview, race scene, and thumbnails.
@@ -78,6 +84,96 @@ export function CarBody({
           </mesh>
         )
       })}
+
+      {/* racing number roundels on both flanks */}
+      <NumberPlates design={design} buffers={buffers} />
+
+      {/* stickers */}
+      {design.decals.map((d) => (
+        <DecalQuad key={d.slot} slot={d.slot} decalId={d.decalId} buffers={buffers} />
+      ))}
     </group>
+  )
+}
+
+const yTopAt = (buffers: CarveBuffers, x: number) => buffers.yTop[idxAt(x)]!
+const halfWidthAt = (buffers: CarveBuffers, x: number) => buffers.halfWidth[idxAt(x)]!
+
+function NumberPlates({ design, buffers }: { design: CarDesign; buffers: CarveBuffers }) {
+  const texture = numberTexture(design.number)
+  const x = 3.1
+  const h = yTopAt(buffers, x)
+  const size = Math.min(0.85, h * 0.85)
+  const y = h * 0.52
+  const z = halfWidthAt(buffers, x) + 0.015
+  return (
+    <>
+      {[1, -1].map((side) => (
+        <mesh
+          key={side}
+          position={[x, y, side * z]}
+          rotation={[0, side > 0 ? 0 : Math.PI, 0]}
+        >
+          <planeGeometry args={[size, size]} />
+          <meshBasicMaterial map={texture} transparent />
+        </mesh>
+      ))}
+    </>
+  )
+}
+
+/** sticker positions on the carved surface, tilted to lie on it */
+function DecalQuad({
+  slot,
+  decalId,
+  buffers,
+}: {
+  slot: DecalSlot
+  decalId: string
+  buffers: CarveBuffers
+}) {
+  const texture = decalTexture(decalId)
+  if (!texture) return null
+
+  if (slot === 'hood' || slot === 'roof') {
+    const x = slot === 'hood' ? 1.5 : 4.7
+    const y = yTopAt(buffers, x) + 0.02
+    // tilt to the local top-surface slope so the sticker lies flat on it
+    const slope = Math.atan2(yTopAt(buffers, x + 0.3) - yTopAt(buffers, x - 0.3), 0.6)
+    const size = Math.min(0.9, halfWidthAt(buffers, x) * 1.7)
+    return (
+      <group position={[x, y, 0]} rotation={[0, 0, slope]}>
+        <mesh rotation={[-Math.PI / 2, 0, -Math.PI / 2]}>
+          <planeGeometry args={[size, size]} />
+          <meshBasicMaterial map={texture} transparent />
+        </mesh>
+      </group>
+    )
+  }
+
+  if (slot === 'tail') {
+    const y = yTopAt(buffers, 6.9) * 0.5
+    const size = Math.min(0.6, yTopAt(buffers, 6.9) * 0.8)
+    return (
+      <mesh position={[7.01, y, 0]} rotation={[0, Math.PI / 2, 0]}>
+        <planeGeometry args={[size, size]} />
+        <meshBasicMaterial map={texture} transparent />
+      </mesh>
+    )
+  }
+
+  const x = slot === 'sideFront' ? 1.5 : 4.9
+  const h = yTopAt(buffers, x)
+  const size = Math.min(0.65, h * 0.8)
+  const z = halfWidthAt(buffers, x) + 0.015
+  return (
+    <>
+      {[1, -1].map((side) => (
+        <mesh key={side} position={[x, h * 0.5, side * z]} rotation={[0, side > 0 ? 0 : Math.PI, 0]}>
+          <planeGeometry args={[size, size]} />
+          <meshBasicMaterial map={texture} transparent />
+        </mesh>
+      ))}
+    </>
   )
 }
