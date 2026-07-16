@@ -38,6 +38,43 @@
   }
 }
 
+/* --- blueprint printing: only the sheet, at true scale, toner-friendly --- */
+@page {
+  size: letter landscape;
+  margin: 10mm;
+}
+
+@media print {
+  html,
+  body,
+  #root {
+    overflow: visible !important;
+    height: auto !important;
+  }
+  body * {
+    visibility: hidden;
+  }
+  .blueprint-sheet,
+  .blueprint-sheet * {
+    visibility: visible;
+  }
+  .blueprint-screen {
+    position: static !important;
+    overflow: visible !important;
+    background: white !important;
+    padding: 0 !important;
+  }
+  .blueprint-sheet {
+    background: white !important;
+    border: none !important;
+    width: auto !important;
+    padding: 0 !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+}
+
 * {
   margin: 0;
   padding: 0;

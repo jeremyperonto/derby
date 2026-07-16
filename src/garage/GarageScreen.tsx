@@ -96,6 +96,9 @@ export function GarageScreen() {
             </Btn>
           </>
         )}
+        <Btn variant="paper" onClick={() => setScreen('blueprint')} title="printable build plans">
+          📐
+        </Btn>
         <Btn
           variant="red"
           onClick={() => setScreen('rivalSelect')}

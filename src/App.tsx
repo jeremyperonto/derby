@@ -2,6 +2,7 @@ import { lazy, Suspense, useRef } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import type { Group } from 'three'
 import { TitleScreen } from './app/TitleScreen'
+import { BlueprintScreen } from './blueprint/BlueprintScreen'
 import { PALETTE } from './content/palette'
 import { GarageScene } from './garage/GarageScene'
 import { GarageScreen } from './garage/GarageScreen'
@@ -75,6 +76,7 @@ export default function App() {
       {screen === 'rivalSelect' && <RivalSelectScreen />}
       {screen === 'race' && <RaceScreen />}
       {screen === 'results' && <ResultsScreen />}
+      {screen === 'blueprint' && <BlueprintScreen />}
       {screen === 'tuning' && (
         <Suspense fallback={null}>
           <TuningPanel />
