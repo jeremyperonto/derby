@@ -1,7 +1,7 @@
 import { useRef } from 'react'
 import type { PointerEvent } from 'react'
 import { sfx } from '../audio/audio'
-import { N, xAt } from '../carve/buffers'
+import { idxAt, N, xAt } from '../carve/buffers'
 import {
   AXLE_X_IN,
   BLOCK,
@@ -10,6 +10,9 @@ import {
   type CarveOp,
 } from '../model/carDesign'
 import { useGarageStore } from '../state/garageStore'
+import { AXLE_Y_IN, WHEEL_RADIUS_IN } from './CarBody'
+
+const WHEEL_WIDTH_IN = 0.32
 
 /**
  * The 2D carve surface: an SVG of the live profile that turns finger drags
@@ -162,13 +165,53 @@ export function CarveView() {
         />
       )}
 
-      {/* axle markers */}
+      {/* wheels where they'll really mount: axle near the bottom edge,
+          wheel overlapping the body's lower band and hanging below it */}
       {view === 'side' &&
         [AXLE_X_IN.front, AXLE_X_IN.rear].map((x) => (
-          <g key={x}>
-            <circle cx={x} cy={sy(0) + 0.16} r={0.14} fill="var(--ink)" fillOpacity={0.7} />
+          <g key={x} pointerEvents="none">
+            <circle
+              cx={x}
+              cy={sy(AXLE_Y_IN)}
+              r={WHEEL_RADIUS_IN}
+              fill="var(--ink)"
+              fillOpacity={0.06}
+              stroke="var(--ink)"
+              strokeOpacity={0.55}
+              strokeWidth={0.03}
+              strokeDasharray="0.1 0.07"
+            />
+            <circle cx={x} cy={sy(AXLE_Y_IN)} r={0.06} fill="var(--ink)" fillOpacity={0.8} />
           </g>
         ))}
+      {view === 'top' &&
+        [AXLE_X_IN.front, AXLE_X_IN.rear].map((x) => {
+          const hw = buffers.halfWidth[idxAt(x)]!
+          return (
+            <g key={x} pointerEvents="none">
+              {[-1, 1].map((side) => {
+                const zInner = BLOCK.widthIn / 2 - side * (hw + 0.03)
+                const rectY = side > 0 ? zInner - WHEEL_WIDTH_IN : zInner
+                return (
+                  <rect
+                    key={side}
+                    x={x - WHEEL_RADIUS_IN}
+                    y={rectY}
+                    width={WHEEL_RADIUS_IN * 2}
+                    height={WHEEL_WIDTH_IN}
+                    fill="var(--ink)"
+                    fillOpacity={0.06}
+                    stroke="var(--ink)"
+                    strokeOpacity={0.55}
+                    strokeWidth={0.03}
+                    strokeDasharray="0.1 0.07"
+                    rx={0.08}
+                  />
+                )
+              })}
+            </g>
+          )
+        })}
 
       {/* slice preview line */}
       {sliceDraft && (
