@@ -29,43 +29,55 @@ function surfacePatch(
 ): BufferGeometry {
   const SEG = 16
   const LIFT = 0.02
-  const half = size / 2
-  const x0 = Math.max(0.05, xCenter - half)
-  const x1 = Math.min(6.95, xCenter + half)
 
   const sampleY = (x: number) => buffers.yTop[idxAt(x)]!
   const sampleHW = (x: number) => buffers.halfWidth[idxAt(x)]!
 
-  // shrink to the tightest cross-section under the footprint
-  let minY = Infinity
-  let minHW = Infinity
-  for (let i = 0; i <= SEG; i++) {
-    const x = x0 + ((x1 - x0) * i) / SEG
-    minY = Math.min(minY, sampleY(x))
-    minHW = Math.min(minHW, sampleHW(x))
+  // measure the tightest cross-section under the requested footprint
+  const measure = (halfSpan: number) => {
+    let minY = Infinity
+    let minHW = Infinity
+    for (let i = 0; i <= SEG; i++) {
+      const x = xCenter - halfSpan + (2 * halfSpan * i) / SEG
+      minY = Math.min(minY, sampleY(x))
+      minHW = Math.min(minHW, sampleHW(x))
+    }
+    return { minY, minHW }
   }
+
+  // keep the patch SQUARE in world space: when the surface constrains one
+  // dimension, shrink BOTH so the artwork never squashes into an oval
+  const probe = measure(size / 2)
+  const fitted = Math.min(size, kind === 'top' ? probe.minHW * 1.6 : probe.minY * 0.8)
+  const half = fitted / 2
+  const x0 = Math.max(0.05, xCenter - half)
+  const x1 = Math.min(6.95, xCenter + half)
+  const { minY } = measure(half)
 
   const positions: number[] = []
   const uvs: number[] = []
   const indices: number[] = []
 
   if (kind === 'top') {
-    const halfW = Math.min(half, minHW * 0.8)
+    // drapes over the top contour (hood slopes, cockpit scoops)
     for (let i = 0; i <= SEG; i++) {
       const x = x0 + ((x1 - x0) * i) / SEG
       const y = sampleY(x) + LIFT
-      positions.push(x, y, -halfW, x, y, halfW)
+      positions.push(x, y, -half, x, y, half)
       // texture top faces the nose, like real hood art
       const v = 1 - i / SEG
       uvs.push(0, v, 1, v)
     }
   } else {
-    const halfH = Math.min(half, minY * 0.4)
+    // level baseline so circles stay circles: only z follows the flank
+    const yCenter = Math.max(
+      half + 0.02,
+      Math.min(sampleY(xCenter) * 0.5, minY - half - 0.02),
+    )
     for (let i = 0; i <= SEG; i++) {
       const x = x0 + ((x1 - x0) * i) / SEG
       const z = (sampleHW(x) + LIFT) * side
-      const yMid = sampleY(x) * 0.5
-      positions.push(x, yMid - halfH, z, x, yMid + halfH, z)
+      positions.push(x, yCenter - half, z, x, yCenter + half, z)
       const u = side > 0 ? i / SEG : 1 - i / SEG // keep glyphs unmirrored on both flanks
       uvs.push(u, 0, u, 1)
     }
@@ -181,11 +193,24 @@ const yTopAt = (buffers: CarveBuffers, x: number) => buffers.yTop[idxAt(x)]!
 
 function NumberPlates({ design, buffers }: { design: CarDesign; buffers: CarveBuffers }) {
   const texture = numberTexture(design.number)
-  const geometries = useMemo(
-    () =>
-      ([1, -1] as const).map((side) => surfacePatch(buffers, 'side', 3.1, 0.85, side)),
-    [buffers],
-  )
+  const geometries = useMemo(() => {
+    // the roundel lives on the "door" (mid-car); within that small window
+    // nudge toward the tallest flank so it sizes up, but never wander to the
+    // nose or tail
+    let bestX = 3.1
+    let bestMin = 0
+    for (let x = 2.7; x <= 3.7; x += 0.1) {
+      let localMin = Infinity
+      for (let dx = -0.42; dx <= 0.42; dx += 0.09) {
+        localMin = Math.min(localMin, buffers.yTop[idxAt(x + dx)]!)
+      }
+      if (localMin > bestMin) {
+        bestMin = localMin
+        bestX = x
+      }
+    }
+    return ([1, -1] as const).map((side) => surfacePatch(buffers, 'side', bestX, 0.85, side))
+  }, [buffers])
   return (
     <>
       {geometries.map((geometry, i) => (
