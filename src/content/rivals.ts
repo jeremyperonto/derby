@@ -4,7 +4,10 @@ import {
   type CarveOp,
   type WeightPlug,
 } from '../model/carDesign'
+import { deriveSimParams } from '../model/deriveSimParams'
 import type { Rng } from '../sim/rng'
+import { runRace } from '../sim/simulate'
+import { TUNING, type Tuning } from '../sim/tuning'
 import type { LessonId } from './lessons'
 import { generateFillerName } from './names'
 import type { PaletteId } from './palette'
@@ -169,7 +172,71 @@ export const RIVALS: Rival[] = [
 
 export const rivalById = (id: string) => RIVALS.find((r) => r.id === id)
 
-/** seeded mid-tier filler car for lanes 3–4 so heats feel populated */
+/**
+ * Filler car for lanes 3–4, guaranteed SLOWER than the heat's rival.
+ * Fillers make the heat feel populated but must never decide it — the rival
+ * is the bar, so winning the heat and beating the rival stay the same
+ * story on the results screen (a kid watches all four cars).
+ *
+ * Construction: a repainted copy of the rival's own car, degraded one notch
+ * at a time (strip a plug → dull the prep → gouge sloppy scoops) and
+ * re-simulated until it is provably slower. Every degradation is monotone
+ * in the sim, so this converges for any rung — even Bobby, who is slower
+ * than a raw block.
+ */
+export function generateCappedFiller(rng: Rng, rival: CarDesign, t: Tuning = TUNING): CarDesign {
+  const noWobble = { ...t, wobble: 0 }
+  const soloTime = (design: CarDesign) =>
+    runRace([deriveSimParams(design, noWobble).params], 1, noWobble).lanes[0]!.finishTime
+  const target = soloTime(rival) + 0.04 // ≥ ~1 car length back, beyond wobble reach
+
+  const paints: PaletteId[] = ['skyBlue', 'mustard', 'orange', 'forest', 'navy', 'paper']
+  let filler: CarDesign = {
+    ...rival,
+    id: `filler-${Math.floor(rng() * 1e9)}`,
+    name: generateFillerName(rng),
+    number: Math.floor(rng() * 100),
+    paint: { body: paints[Math.floor(rng() * paints.length)]!, wheels: 'ink' },
+    decals: [],
+    carve: { ops: [...rival.carve.ops] },
+    weights: [...rival.weights],
+    wheels: { ...rival.wheels },
+  }
+
+  let deck = 1.25 // progressive whittling height for the last-resort degrade
+  for (let guard = 0; guard < 24; guard++) {
+    if (soloTime(filler) > target) return filler
+    if (filler.weights.length > 0) {
+      filler = { ...filler, weights: filler.weights.slice(0, -1) }
+    } else if (filler.wheels.graphite > 0) {
+      filler = {
+        ...filler,
+        wheels: { ...filler.wheels, graphite: (filler.wheels.graphite - 1) as 0 | 1 | 2 | 3 },
+      }
+    } else if (filler.wheels.polish > 0) {
+      filler = {
+        ...filler,
+        wheels: { ...filler.wheels, polish: (filler.wheels.polish - 1) as 0 | 1 | 2 | 3 },
+      }
+    } else {
+      // out of hardware to strip: whittle the whole deck lower — strictly
+      // less wood every step (lighter ⇒ slower for a prep-less cruiser)
+      deck -= 0.06 + rng() * 0.04
+      filler = {
+        ...filler,
+        carve: {
+          ops: [
+            ...filler.carve.ops,
+            { t: 'slice', view: 'side', ax: 0, ay: deck, bx: 7, by: deck },
+          ],
+        },
+      }
+    }
+  }
+  return filler
+}
+
+/** seeded mid-tier filler car (uncapped; use generateCappedFiller for heats) */
 export function generateFillerDesign(rng: Rng): CarDesign {
   const template = rng() < 0.5 ? wedgeOps : speederOps
   const paints: PaletteId[] = ['skyBlue', 'mustard', 'orange', 'forest', 'navy', 'paper']

@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { RIVALS, rivalById } from '../src/content/rivals'
+import { generateCappedFiller, RIVALS, rivalById } from '../src/content/rivals'
 import { TEST_CARS } from '../src/content/testCars'
 import { deriveSimParams } from '../src/model/deriveSimParams'
 import { bestTips } from '../src/sim/feedback'
+import { mulberry32 } from '../src/sim/rng'
 import { runRace } from '../src/sim/simulate'
 import { TUNING } from '../src/sim/tuning'
 
@@ -55,6 +56,22 @@ describe('rivals ladder', () => {
     )
     expect(Math.max(...times)).toBe(times[0])
     expect(Math.min(...times)).toBe(times[times.length - 1])
+  })
+
+  it('filler cars are always slower than their heat rival — they never decide the heat', () => {
+    const noWobble = { ...TUNING, wobble: 0 }
+    const solo = (design: Parameters<typeof deriveSimParams>[0]) =>
+      runRace([deriveSimParams(design, noWobble).params], 1, noWobble).lanes[0]!.finishTime
+    for (const rival of RIVALS) {
+      const rivalTime = solo(rival.design)
+      for (let seed = 1; seed <= 8; seed++) {
+        const filler = generateCappedFiller(mulberry32(seed * 977), rival.design)
+        expect(
+          solo(filler),
+          `filler (seed ${seed}) out-raced ${rival.name}`,
+        ).toBeGreaterThan(rivalTime + 0.03)
+      }
+    }
   })
 
   it('a mastery build can beat Lena (the boss is winnable, but demands a real carve)', () => {

@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { replayOps } from '../carve/replay'
 import type { CarveBuffers } from '../carve/buffers'
-import { generateFillerDesign, rivalById } from '../content/rivals'
+import { generateCappedFiller, rivalById } from '../content/rivals'
 import { recordBestTime } from '../lib/storage'
 import type { CarDesign } from '../model/carDesign'
 import { deriveSimParams, type CarSimParams } from '../model/deriveSimParams'
@@ -92,13 +92,14 @@ export const useRaceStore = create<RaceState>((set, get) => ({
     const attempt = get().attempt + 1
     const seed = hashSeed(`${rivalId}:${attempt}:${player.id}`)
 
-    // lanes: filler, PLAYER, RIVAL, filler — fillers seeded from the race seed
+    // lanes: filler, PLAYER, RIVAL, filler — fillers seeded from the race
+    // seed and capped below the rival so they never decide the heat
     const fillerRng = mulberry32(seed ^ 0x9e3779b9)
     const designs = [
-      generateFillerDesign(fillerRng),
+      generateCappedFiller(fillerRng, rival.design),
       player,
       rival.design,
-      generateFillerDesign(fillerRng),
+      generateCappedFiller(fillerRng, rival.design),
     ]
     const lanes: LaneEntry[] = designs.map((design, lane) => ({
       design,

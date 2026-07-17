@@ -28,21 +28,25 @@ export function ResultsScreen() {
   const outcome = useMemo(() => {
     if (!raceData || !rivalId) return null
     const rival = rivalById(rivalId)!
+    // winning means WINNING THE HEAT — a kid watches all four cars, so the
+    // celebration must match the finish line (fillers are capped below the
+    // rival, so heat winner ≡ rival beaten in practice)
+    const wonHeat = raceData.order[0] === PLAYER_LANE
+    const heatWinner = lanes[raceData.order[0]!]!
     const playerTime = raceData.lanes[PLAYER_LANE]!.finishTime
     const rivalTime = raceData.lanes[RIVAL_LANE]!.finishTime
-    const beatRival = playerTime < rivalTime
     const speed = raceData.lanes[PLAYER_LANE]!.finishSpeed || 4.5
     const marginLengths = (Math.abs(rivalTime - playerTime) * speed) / CAR_LENGTH_M
 
-    if (beatRival) {
+    if (wonHeat) {
       const newUnlocks = recordWin(rivalId, marginLengths)
       const nextRival = RIVALS[RIVALS.findIndex((r) => r.id === rivalId) + 1]
-      return { beatRival, rival, marginLengths, newUnlocks, nextRival, tip: undefined }
+      return { wonHeat, heatWinner, rival, marginLengths, newUnlocks, nextRival, tip: undefined }
     }
 
     const playerDesign = lanes[PLAYER_LANE]!.design
     const tips = bestTips(playerDesign, laneParams, PLAYER_LANE, RIVAL_LANE, raceData.seed)
-    return { beatRival, rival, marginLengths, newUnlocks: [], nextRival: undefined, tip: tips[0] }
+    return { wonHeat, heatWinner, rival, marginLengths, newUnlocks: [], nextRival: undefined, tip: tips[0] }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [raceData, rivalId])
 
@@ -55,9 +59,9 @@ export function ResultsScreen() {
   // celebration + narration when the panel appears
   useEffect(() => {
     if (!outcome || !lesson) return
-    if (outcome.beatRival) {
+    if (outcome.wonHeat) {
       sfx.fanfare()
-      speak(`You beat ${outcome.rival.name}!`)
+      speak(`You won the heat — you beat ${outcome.rival.name}!`)
     } else {
       sfx.womp()
       const line = outcome.tip
@@ -109,13 +113,15 @@ export function ResultsScreen() {
             fontSize: '1.45rem',
             fontWeight: 600,
             letterSpacing: '0.12em',
-            color: outcome.beatRival ? 'var(--brick-red)' : 'var(--navy)',
+            color: outcome.wonHeat ? 'var(--brick-red)' : 'var(--navy)',
             marginBottom: 2,
           }}
         >
-          {outcome.beatRival ? `You beat ${outcome.rival.name}!` : `${outcome.rival.name} takes it`}
+          {outcome.wonHeat
+            ? `You beat ${outcome.rival.name}!`
+            : `${outcome.heatWinner.isRival ? outcome.rival.name : outcome.heatWinner.design.name} takes it`}
         </h2>
-        {!outcome.beatRival && (
+        {!outcome.wonHeat && (
           <div style={{ textAlign: 'center', fontFamily: 'var(--font-script)', fontSize: '1.3rem', color: 'var(--navy)', marginBottom: 4 }}>
             so close!
           </div>
@@ -202,7 +208,7 @@ export function ResultsScreen() {
         )}
 
         {/* pit crew tip on a loss */}
-        {!outcome.beatRival && (
+        {!outcome.wonHeat && (
           <div
             style={{
               marginTop: 12,
@@ -251,7 +257,7 @@ export function ResultsScreen() {
           <Btn onClick={() => setScreen('garage')}>
             <IconWrench size={17} /> Garage
           </Btn>
-          {outcome.beatRival && outcome.nextRival && (
+          {outcome.wonHeat && outcome.nextRival && (
             <Btn variant="ink" onClick={() => setScreen('rivalSelect')}>
               <IconFlag size={17} /> Next: {outcome.nextRival.name}
             </Btn>
