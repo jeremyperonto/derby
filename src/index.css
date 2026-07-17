@@ -79,8 +79,23 @@
   .blueprint-sheet {
     background: white !important;
     border: none !important;
+    box-shadow: none !important;
     width: auto !important;
     padding: 0 !important;
+    color: #000 !important;
+  }
+  /* toner-friendly linework: solid black outlines, no wood tint */
+  .blueprint-sheet .bp-line {
+    fill: #fff !important;
+    fill-opacity: 1 !important;
+    stroke: #000 !important;
+  }
+  .blueprint-sheet .dim-bg {
+    fill: #fff !important;
+  }
+  /* stack the columns so the true-scale profiles get the full page width */
+  .blueprint-sheet .bp-body {
+    flex-direction: column !important;
   }
   .no-print {
     display: none !important;
