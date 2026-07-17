@@ -92,8 +92,8 @@ export function GarageScreen() {
             </Btn>
           </>
         )}
-        <Btn onClick={() => setScreen('blueprint')} title="printable build plans">
-          <IconRuler size={18} />
+        <Btn onClick={() => setScreen('blueprint')} title="print real-world plans for this car">
+          <IconRuler size={18} /> Build Plans
         </Btn>
         <Btn variant="red" size="lg" onClick={() => setScreen('rivalSelect')}>
           <IconFlag size={20} /> Race

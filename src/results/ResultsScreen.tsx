@@ -13,7 +13,7 @@ import { PLAYER_LANE, RIVAL_LANE, useRaceStore } from '../state/raceStore'
 import { bestTips, lengthsPhrase } from '../sim/feedback'
 import { CAR_LENGTH_M } from '../sim/tuning'
 import { Btn } from '../ui/Btn'
-import { IconFlag, IconRematch, IconWrench, LessonIcon } from '../ui/icons'
+import { IconFlag, IconRematch, IconRuler, IconWrench, LessonIcon } from '../ui/icons'
 import { DiamondRule } from '../ui/ornaments'
 
 function SpecRow({ label, value }: { label: string; value: string }) {
@@ -334,6 +334,27 @@ export function ResultsScreen() {
             </Btn>
           )}
         </div>
+
+        {/* the screen-to-workbench bridge: a winning car has earned real plans */}
+        {outcome.wonHeat && (
+          <button
+            onClick={() => setScreen('blueprint')}
+            className="lp-label"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              margin: '12px auto 0',
+              fontSize: '0.7rem',
+              color: 'var(--brick-red)',
+              textDecoration: 'underline',
+              textUnderlineOffset: 3,
+              cursor: 'pointer',
+            }}
+          >
+            <IconRuler size={15} /> Print this car&rsquo;s real build plans
+          </button>
+        )}
       </div>
     </div>
   )
