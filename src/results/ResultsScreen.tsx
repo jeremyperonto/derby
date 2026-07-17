@@ -4,6 +4,8 @@ import { speak } from '../audio/narration'
 import { LESSONS } from '../content/lessons'
 import { rivalById, RIVALS } from '../content/rivals'
 import { unlockById } from '../content/unlocks'
+import { medalDataURL } from '../garage/carDecals'
+import { MiniProfile } from '../garage/CarWall'
 import { useAppStore } from '../state/appStore'
 import { useProgressStore } from '../state/progressStore'
 import { PLAYER_LANE, RIVAL_LANE, useRaceStore } from '../state/raceStore'
@@ -12,8 +14,6 @@ import { CAR_LENGTH_M } from '../sim/tuning'
 import { Btn } from '../ui/Btn'
 import { IconFlag, IconRematch, IconWrench, LessonIcon } from '../ui/icons'
 import { DiamondRule } from '../ui/ornaments'
-
-const PLACES = ['1st', '2nd', '3rd', '4th']
 
 export function ResultsScreen() {
   const setScreen = useAppStore((s) => s.setScreen)
@@ -98,21 +98,27 @@ export function ResultsScreen() {
           color: 'var(--ink)',
         }}
       >
+        {/* eyebrow */}
+        <div className="lp-label" style={{ textAlign: 'center', fontSize: '0.62rem', color: 'var(--navy)', marginBottom: 6 }}>
+          Official results — Derby Dash Speedway
+        </div>
+
+        {/* headline: letterspaced gothic caps, not the display face */}
         <h2
+          className="lp-label"
           style={{
             textAlign: 'center',
-            fontFamily: 'var(--font-display)',
-            fontWeight: 400,
-            fontSize: '1.75rem',
+            fontSize: '1.45rem',
+            fontWeight: 600,
+            letterSpacing: '0.12em',
             color: outcome.beatRival ? 'var(--brick-red)' : 'var(--navy)',
-            textShadow: outcome.beatRival ? '1.5px 1.5px 0 var(--ink)' : 'none',
-            marginBottom: 4,
+            marginBottom: 2,
           }}
         >
-          {outcome.beatRival ? `YOU BEAT ${outcome.rival.name.toUpperCase()}!` : `${outcome.rival.name} takes it`}
+          {outcome.beatRival ? `You beat ${outcome.rival.name}!` : `${outcome.rival.name} takes it`}
         </h2>
         {!outcome.beatRival && (
-          <div style={{ textAlign: 'center', fontFamily: 'var(--font-script)', fontSize: '1.3rem', color: 'var(--navy)', marginBottom: 6 }}>
+          <div style={{ textAlign: 'center', fontFamily: 'var(--font-script)', fontSize: '1.3rem', color: 'var(--navy)', marginBottom: 4 }}>
             so close!
           </div>
         )}
@@ -120,7 +126,36 @@ export function ResultsScreen() {
           <DiamondRule width={200} />
         </div>
 
-        {/* heat placings */}
+        {/* the winner's car, framed */}
+        {(() => {
+          const winnerLane = raceData.order[0]!
+          const winner = lanes[winnerLane]!
+          return (
+            <div
+              style={{
+                border: '2px solid var(--ink)',
+                borderRadius: 2,
+                background: 'var(--kraft)',
+                padding: '8px 12px 4px',
+                marginBottom: 12,
+                position: 'relative',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <img src={medalDataURL(0)} width={46} height={46} alt="first place" style={{ flexShrink: 0 }} />
+                <div style={{ flex: 1 }}>
+                  <MiniProfile design={winner.design} />
+                </div>
+              </div>
+              <div className="lp-label" style={{ textAlign: 'center', fontSize: '0.68rem', padding: '2px 0 4px' }}>
+                Winner: {winner.design.name} No.{winner.design.number}
+                {winner.isPlayer ? ' — that’s you!' : winner.isRival ? ` — ${outcome.rival.name}` : ''}
+              </div>
+            </div>
+          )
+        })()}
+
+        {/* heat placings, each with its medal */}
         {raceData.order.map((lane, place) => {
           const entry = lanes[lane]!
           const time = raceData.lanes[lane]!.finishTime
@@ -132,25 +167,12 @@ export function ResultsScreen() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: 10,
-                padding: '6px 8px',
+                padding: '5px 8px',
                 borderTop: place === 0 ? 'none' : '1px solid rgba(33,29,22,0.25)',
                 background: entry.isPlayer ? 'rgba(217,160,63,0.28)' : 'transparent',
               }}
             >
-              <span
-                className="lp-label"
-                style={{
-                  width: 40,
-                  fontSize: '0.72rem',
-                  textAlign: 'center',
-                  border: '1.5px solid var(--ink)',
-                  padding: '2px 0',
-                  background: place === 0 ? 'var(--ink)' : 'transparent',
-                  color: place === 0 ? 'var(--paper)' : 'var(--ink)',
-                }}
-              >
-                {PLACES[place]}
-              </span>
+              <img src={medalDataURL(place)} width={30} height={30} alt={`place ${place + 1}`} style={{ flexShrink: 0 }} />
               <span className="lp-label" style={{ flex: 1, fontSize: '0.82rem', fontWeight: entry.isPlayer ? 600 : 400 }}>
                 {entry.design.name} No.{entry.design.number}
                 {entry.isPlayer ? ' — you' : entry.isRival ? ` — ${outcome.rival.name}` : ''}

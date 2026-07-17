@@ -237,37 +237,49 @@ export function stickerDataURL(decalId: string): string | null {
 }
 
 /** drawn place medal: ribbon + disc + numeral */
-export function medalTexture(place: number): CanvasTexture {
+function drawMedal(ctx: CanvasRenderingContext2D, s: number, place: number): void {
   const disc = [PALETTE.mustard, '#b9bec7', '#c08850', PALETTE.paper][Math.min(place, 3)]!
-  return makeTexture(`medal:${place}`, (ctx, s) => {
-    ctx.clearRect(0, 0, s, s)
-    // ribbon tails
-    ctx.fillStyle = PALETTE.brickRed
-    ctx.beginPath()
-    ctx.moveTo(s * 0.38, s * 0.06)
-    ctx.lineTo(s * 0.5, s * 0.4)
-    ctx.lineTo(s * 0.3, s * 0.42)
-    ctx.closePath()
-    ctx.fill()
-    ctx.fillStyle = PALETTE.navy
-    ctx.beginPath()
-    ctx.moveTo(s * 0.62, s * 0.06)
-    ctx.lineTo(s * 0.5, s * 0.4)
-    ctx.lineTo(s * 0.7, s * 0.42)
-    ctx.closePath()
-    ctx.fill()
-    // disc
-    ctx.beginPath()
-    ctx.arc(s / 2, s * 0.62, s * 0.28, 0, Math.PI * 2)
-    ctx.fillStyle = disc
-    ctx.fill()
-    ctx.lineWidth = s * 0.045
-    ctx.strokeStyle = PALETTE.ink
-    ctx.stroke()
-    ctx.fillStyle = PALETTE.ink
-    ctx.font = `600 ${s * 0.3}px Oswald, 'Arial Narrow', sans-serif`
-    ctx.textAlign = 'center'
-    ctx.textBaseline = 'middle'
-    ctx.fillText(String(place + 1), s / 2, s * 0.64)
-  })
+  ctx.clearRect(0, 0, s, s)
+  // ribbon tails
+  ctx.fillStyle = PALETTE.brickRed
+  ctx.beginPath()
+  ctx.moveTo(s * 0.38, s * 0.06)
+  ctx.lineTo(s * 0.5, s * 0.4)
+  ctx.lineTo(s * 0.3, s * 0.42)
+  ctx.closePath()
+  ctx.fill()
+  ctx.fillStyle = PALETTE.navy
+  ctx.beginPath()
+  ctx.moveTo(s * 0.62, s * 0.06)
+  ctx.lineTo(s * 0.5, s * 0.4)
+  ctx.lineTo(s * 0.7, s * 0.42)
+  ctx.closePath()
+  ctx.fill()
+  // disc
+  ctx.beginPath()
+  ctx.arc(s / 2, s * 0.62, s * 0.28, 0, Math.PI * 2)
+  ctx.fillStyle = disc
+  ctx.fill()
+  ctx.lineWidth = s * 0.045
+  ctx.strokeStyle = PALETTE.ink
+  ctx.stroke()
+  ctx.fillStyle = PALETTE.ink
+  ctx.font = `600 ${s * 0.3}px Oswald, 'Arial Narrow', sans-serif`
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  ctx.fillText(String(place + 1), s / 2, s * 0.64)
+}
+
+export function medalTexture(place: number): CanvasTexture {
+  return makeTexture(`medal:${place}`, (ctx, s) => drawMedal(ctx, s, place))
+}
+
+/** same medal as a data URL for DOM use (results list, winner plaque) */
+export function medalDataURL(place: number): string {
+  const key = `medal:${place}`
+  const cached = dataUrlCache.get(key)
+  if (cached) return cached
+  const url = drawToCanvas((ctx, s) => drawMedal(ctx, s, place), 96).toDataURL()
+  dataUrlCache.set(key, url)
+  return url
 }
