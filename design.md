@@ -123,7 +123,7 @@ Races run at real derby speed (~3 seconds gate to line — genuinely how fast th
 
 ## 5. Rivals ladder & progression
 
-Six authored rivals, each a real car design run through the real simulation — each one *loses* to exactly the lesson it teaches:
+Nine authored rivals in three **divisions of similar strength** (Rookie → Challenger → Champion, three racers each; beat any two in a division to enter the next). Race anyone in an unlocked division. Every rival is a real car design run through the real simulation — each one *loses* to exactly the lesson it teaches, every first victory grants a prize (paint or sticker), and the results screen shows **how the winner was built** (weight, balance, prep, shape) so kids study construction. The original six:
 
 | # | Rival | Their car | The lesson |
 |---|---|---|---|
