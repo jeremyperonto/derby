@@ -11,7 +11,7 @@
   --forest: #4a6b4f;
 
   /* letterpress type system — see the Dribbble refs in design.md §9 */
-  --font-display: 'Rye', 'Georgia', serif; /* woodtype carnival display */
+  --font-display: 'Anton', 'Arial Narrow', sans-serif; /* heavy speedway wood-type */
   --font-label: 'Oswald', 'Arial Narrow', sans-serif; /* letterspaced gothic caps */
   --font-script: 'Yellowtail', cursive; /* signpainter accents */
   --font-prose: Georgia, 'Times New Roman', serif; /* longer read-aloud text */

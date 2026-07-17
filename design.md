@@ -245,7 +245,7 @@ Car paints draw from the same family (several unlockable). The 3D world uses the
 
 Reference boards: Dustin Commer's *1st Annual Pinewood Derby* badge, Commence Studio's *Derby Barber* tearsheet, James David Horton's *RedBull Soap Box Racer* illustration. One-ink letterpress discipline throughout:
 
-- **Display**: Rye (woodtype carnival serif) — titles, headers, car numbers. Brick red with a thin ink shadow for heroes; plain ink elsewhere.
+- **Display**: Anton (heavy condensed speedway wood-type) — titles, headers, car numbers. Brick red with a thin ink shadow for heroes; plain ink elsewhere.
 - **Labels/UI**: Oswald, uppercase, letterspaced 0.12–0.14em (the `lp-label` class) — every button, tab, legend, and chip.
 - **Script accents**: Yellowtail — taglines and rival quips ("so close!", "carve it · race it").
 - **Prose**: Georgia/serif italic — read-aloud text (intros, Pit Crew Notes, balance hints).

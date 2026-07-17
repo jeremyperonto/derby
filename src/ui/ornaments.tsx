@@ -68,9 +68,9 @@ export function StarColumn({ size = 34 }: { size?: number }) {
  * is registered to the wing by construction.
  */
 export function CrossedFlags({ width = 220 }: { width?: number }) {
-  const CELL = 8
-  const COLS = 5
-  const ROWS = 3
+  const CELL = 11
+  const COLS = 4
+  const ROWS = 2
   const wingW = CELL * COLS
   const wingH = CELL * ROWS
 
@@ -85,19 +85,19 @@ export function CrossedFlags({ width = 220 }: { width?: number }) {
           ) : null,
         ),
       )}
-      <rect x={0} y={0} width={wingW} height={wingH} fill="none" stroke="currentColor" strokeWidth={2.4} />
+      <rect x={0} y={0} width={wingW} height={wingH} fill="none" stroke="currentColor" strokeWidth={2.2} />
     </g>
   )
 
+  // wings rise outward at 12°; stars sit fully tucked in the V between them,
+  // the whole cluster mirror-exact about x=120
   return (
-    <svg width={width} height={width * 0.31} viewBox="0 0 220 68" fill="none">
-      {/* right wing rises outward; left is its mirror */}
-      <g transform="translate(121,32) skewY(-14)">{wing}</g>
-      <g transform="translate(99,32) scale(-1,1) skewY(-14)">{wing}</g>
-      {/* star column between the wings */}
-      <polygon points={starPoints(110, 22, 8)} fill="currentColor" />
-      <polygon points={starPoints(110, 41, 5.5)} fill="currentColor" />
-      <polygon points={starPoints(110, 56, 4.2)} fill="currentColor" />
+    <svg width={width} height={width * 0.28} viewBox="0 0 240 68" fill="none">
+      <g transform="translate(136,28) skewY(-12)">{wing}</g>
+      <g transform="translate(104,28) scale(-1,1) skewY(-12)">{wing}</g>
+      <polygon points={starPoints(120, 26, 8)} fill="currentColor" />
+      <polygon points={starPoints(120, 44, 5.2)} fill="currentColor" />
+      <polygon points={starPoints(120, 57, 3.8)} fill="currentColor" />
     </svg>
   )
 }

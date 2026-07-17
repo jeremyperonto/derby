@@ -39,7 +39,7 @@ export function TitleScreen() {
           gap: 4,
         }}
       >
-        <CrossedFlags width={190} />
+        <CrossedFlags width={215} />
 
         {/* arched top line */}
         <svg width={460} height={46} viewBox="0 0 460 46" style={{ marginTop: -6, maxWidth: '94vw' }}>
@@ -60,11 +60,11 @@ export function TitleScreen() {
             fontWeight: 400,
             fontSize: 'clamp(2.6rem, 8.5vw, 5rem)',
             lineHeight: 0.95,
-            letterSpacing: '0.02em',
+            letterSpacing: '0.06em',
             color: 'var(--brick-red)',
-            textShadow: '2.5px 2.5px 0 var(--ink)',
+            textShadow: '3px 3px 0 var(--ink)',
             textAlign: 'center',
-            margin: '2px 0 0',
+            margin: '4px 0 0',
           }}
         >
           DERBY DASH
