@@ -5,7 +5,6 @@ import { LESSONS } from '../content/lessons'
 import { rivalById, RIVALS } from '../content/rivals'
 import { unlockById } from '../content/unlocks'
 import { medalDataURL } from '../garage/carDecals'
-import { MiniProfile } from '../garage/CarWall'
 import { useAppStore } from '../state/appStore'
 import { useProgressStore } from '../state/progressStore'
 import { PLAYER_LANE, RIVAL_LANE, useRaceStore } from '../state/raceStore'
@@ -78,9 +77,9 @@ export function ResultsScreen() {
         inset: 0,
         display: 'flex',
         flexDirection: 'column',
-        alignItems: 'center',
+        alignItems: 'flex-start',
         justifyContent: 'center',
-        gap: 14,
+        padding: '14px 0 14px 18px',
         pointerEvents: 'none',
         overflowY: 'auto',
       }}
@@ -92,8 +91,7 @@ export function ResultsScreen() {
           boxShadow: 'inset 0 0 0 4px var(--paper), inset 0 0 0 5.5px var(--ink)',
           borderRadius: 2,
           padding: '20px 26px',
-          minWidth: 'min(520px, 94vw)',
-          maxWidth: 640,
+          width: 'min(540px, 92vw)',
           pointerEvents: 'auto',
           color: 'var(--ink)',
         }}
@@ -126,7 +124,7 @@ export function ResultsScreen() {
           <DiamondRule width={200} />
         </div>
 
-        {/* the winner's car, framed */}
+        {/* the winner spins in the 3D winner's circle beside this panel */}
         {(() => {
           const winnerLane = raceData.order[0]!
           const winner = lanes[winnerLane]!
@@ -136,19 +134,16 @@ export function ResultsScreen() {
                 border: '2px solid var(--ink)',
                 borderRadius: 2,
                 background: 'var(--kraft)',
-                padding: '8px 12px 4px',
+                padding: '7px 12px',
                 marginBottom: 12,
-                position: 'relative',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 10,
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <img src={medalDataURL(0)} width={46} height={46} alt="first place" style={{ flexShrink: 0 }} />
-                <div style={{ flex: 1 }}>
-                  <MiniProfile design={winner.design} />
-                </div>
-              </div>
-              <div className="lp-label" style={{ textAlign: 'center', fontSize: '0.68rem', padding: '2px 0 4px' }}>
-                Winner: {winner.design.name} No.{winner.design.number}
+              <img src={medalDataURL(0)} width={38} height={38} alt="first place" style={{ flexShrink: 0 }} />
+              <div className="lp-label" style={{ fontSize: '0.7rem', lineHeight: 1.5 }}>
+                In the winner&rsquo;s circle: {winner.design.name} No.{winner.design.number}
                 {winner.isPlayer ? ' — that’s you!' : winner.isRival ? ` — ${outcome.rival.name}` : ''}
               </div>
             </div>

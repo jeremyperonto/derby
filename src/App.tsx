@@ -12,6 +12,7 @@ import { RaceScreen } from './race/RaceScreen'
 import { RivalSelectScreen } from './race/RivalSelectScreen'
 import { TrackScene } from './race/TrackScene'
 import { ResultsScreen } from './results/ResultsScreen'
+import { WinnersCircle } from './results/WinnersCircle'
 import { useAppStore } from './state/appStore'
 
 const TuningPanel = lazy(() => import('./app/TuningPanel'))
@@ -31,13 +32,14 @@ function SceneRouter() {
       <directionalLight position={[4, 8, 6]} intensity={1.2} />
       {(screen === 'title' || screen === 'tuning') && <TitleShowcase />}
       {screen === 'garage' && <GarageScene />}
-      {(screen === 'race' || screen === 'results') && (
+      {screen === 'race' && (
         <>
           <TrackScene />
           <RaceCars />
           <CameraRig />
         </>
       )}
+      {screen === 'results' && <WinnersCircle />}
     </>
   )
 }
