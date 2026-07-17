@@ -1,14 +1,11 @@
 import { useGarageStore } from '../state/garageStore'
-import { Btn } from '../ui/Btn'
+import { Fieldset, Seg } from '../ui/Fieldset'
 
 /**
  * Wheels station: axle polish, graphite, raised wheel — the friction
- * lessons. The Squeak-O-Meter makes μ tangible for a six-year-old.
+ * lessons, each a labeled letterpress control group. The Squeak-O-Meter
+ * makes μ tangible for a six-year-old.
  */
-
-const POLISH_LEVELS = ['🪵 rough', '🩹 sanded', '✨ smooth', '💎 mirror']
-const GRAPHITE_LEVELS = ['0 puffs', '1 puff 🌫️', '2 puffs 🌫️🌫️', '3 puffs 🌫️🌫️🌫️']
-
 export function WheelsView() {
   const design = useGarageStore((s) => s.design)
   const derived = useGarageStore((s) => s.derived)
@@ -20,108 +17,73 @@ export function WheelsView() {
   const squeak = Math.max(0, Math.min(1, (derived.params.muAxle - 0.08) / 0.22))
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 18, padding: '8px 4px' }}>
-      <StationRow
-        title="🔩 Axle polish"
-        hint="Shine up the nails the wheels spin on — smooth = fast!"
-      >
-        {POLISH_LEVELS.map((label, level) => (
-          <Btn
-            key={level}
-            variant="paper"
-            active={polish === level}
-            onClick={() => setWheels({ polish: level as 0 | 1 | 2 | 3 })}
-          >
-            {label}
-          </Btn>
-        ))}
-      </StationRow>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 14, padding: '4px 2px', overflowY: 'auto' }}>
+      <Fieldset legend="Axle polish — shine the nails the wheels spin on" contentStyle={{ flexDirection: 'column', alignItems: 'flex-start' }}>
+        <Seg
+          value={polish}
+          onChange={(level) => setWheels({ polish: level as 0 | 1 | 2 | 3 })}
+          options={[
+            { value: 0, label: 'Rough' },
+            { value: 1, label: 'Sanded' },
+            { value: 2, label: 'Smooth' },
+            { value: 3, label: 'Mirror' },
+          ]}
+        />
+      </Fieldset>
 
-      <StationRow
-        title="🌫️ Graphite powder"
-        hint="The classic derby trick — slippery dust for the axles."
-      >
-        {GRAPHITE_LEVELS.map((label, level) => (
-          <Btn
-            key={level}
-            variant="paper"
-            active={graphite === level}
-            onClick={() => setWheels({ graphite: level as 0 | 1 | 2 | 3 })}
-          >
-            {label}
-          </Btn>
-        ))}
-      </StationRow>
+      <Fieldset legend="Graphite — the classic slippery derby dust" contentStyle={{ flexDirection: 'column', alignItems: 'flex-start' }}>
+        <Seg
+          value={graphite}
+          onChange={(level) => setWheels({ graphite: level as 0 | 1 | 2 | 3 })}
+          options={[
+            { value: 0, label: 'None' },
+            { value: 1, label: '1 puff' },
+            { value: 2, label: '2 puffs' },
+            { value: 3, label: '3 puffs' },
+          ]}
+        />
+      </Fieldset>
 
-      <StationRow
-        title="🎈 Raised wheel"
-        hint="Lift one front wheel — three shoes rub less than four!"
-      >
-        <Btn
-          variant="paper"
-          active={raised === 'none'}
-          onClick={() => setWheels({ raised: 'none' })}
-        >
-          4 wheels down
-        </Btn>
-        <Btn
-          variant="paper"
-          active={raised === 'frontLeft'}
-          onClick={() => setWheels({ raised: 'frontLeft' })}
-        >
-          front wheel up 🎈
-        </Btn>
-      </StationRow>
+      <Fieldset legend="Raised wheel — three shoes rub less than four" contentStyle={{ flexDirection: 'column', alignItems: 'flex-start' }}>
+        <Seg
+          value={raised}
+          onChange={(r) => setWheels({ raised: r as 'none' | 'frontLeft' })}
+          options={[
+            { value: 'none', label: 'All four down' },
+            { value: 'frontLeft', label: 'Front wheel up' },
+          ]}
+        />
+      </Fieldset>
 
-      {/* Squeak-O-Meter */}
-      <div>
-        <div style={{ fontWeight: 900, marginBottom: 6 }}>Squeak-O-Meter</div>
+      <Fieldset legend="Squeak-o-meter" contentStyle={{ flexDirection: 'column', alignItems: 'stretch' }}>
         <div
           style={{
-            height: 26,
-            borderRadius: 13,
-            border: '3px solid var(--ink)',
+            height: 22,
+            border: '2px solid var(--ink)',
+            borderRadius: 2,
             background: 'linear-gradient(90deg, var(--forest), var(--mustard), var(--brick-red))',
             position: 'relative',
           }}
         >
-          <div
+          <svg
+            width={18}
+            height={12}
+            viewBox="0 0 18 12"
             style={{
               position: 'absolute',
-              left: `calc(${(squeak * 100).toFixed(1)}% - 10px)`,
-              top: -8,
-              fontSize: 22,
+              left: `calc(${(squeak * 100).toFixed(1)}% - 9px)`,
+              top: -13,
               transition: 'left 300ms',
             }}
           >
-            🔻
-          </div>
+            <path d="M2 1h14L9 11z" fill="var(--ink)" />
+          </svg>
         </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700, color: 'var(--navy)' }}>
-          <span>🤫 whisper quiet (fast)</span>
-          <span>🔊 squeaky (slow)</span>
+        <div className="lp-label" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.68rem', color: 'var(--navy)' }}>
+          <span>whisper quiet — fast</span>
+          <span>squeaky — slow</span>
         </div>
-      </div>
-    </div>
-  )
-}
-
-function StationRow({
-  title,
-  hint,
-  children,
-}: {
-  title: string
-  hint: string
-  children: React.ReactNode
-}) {
-  return (
-    <div>
-      <div style={{ fontWeight: 900 }}>{title}</div>
-      <div style={{ color: 'var(--navy)', fontWeight: 600, fontSize: '0.92rem', marginBottom: 8 }}>
-        {hint}
-      </div>
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>{children}</div>
+      </Fieldset>
     </div>
   )
 }

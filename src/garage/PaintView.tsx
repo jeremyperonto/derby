@@ -5,10 +5,13 @@ import { DECAL_SLOTS } from '../model/carDesign'
 import { useGarageStore } from '../state/garageStore'
 import { useProgressStore } from '../state/progressStore'
 import { Btn } from '../ui/Btn'
+import { Fieldset } from '../ui/Fieldset'
+import { IconDice, IconMinus, IconPlus } from '../ui/icons'
+import { stickerDataURL } from './carDecals'
 
 /**
  * Paint & decals station: body/wheel colors, racing number, car name, and
- * one-tap sticker slots (tapping a slot cycles through the stickers).
+ * one-tap sticker spots (tapping a spot cycles through the stickers).
  */
 export function PaintView() {
   const design = useGarageStore((s) => s.design)
@@ -29,96 +32,103 @@ export function PaintView() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16, padding: '6px 4px', overflowY: 'auto' }}>
-      <div>
-        <div style={{ fontWeight: 900, marginBottom: 6 }}>
-          🎨 Body paint{' '}
-          <span style={{ fontWeight: 600, fontSize: '0.85rem', color: 'var(--navy)' }}>
-            (beat rivals to win more colors!)
-          </span>
-        </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '2px 0', overflowY: 'auto' }}>
+      <Fieldset legend="Body paint — beat rivals to win more colors">
         <SwatchRow paints={paints} selected={design.paint.body} onPick={(body) => setPaint({ body })} />
-      </div>
+      </Fieldset>
 
-      <div>
-        <div style={{ fontWeight: 900, marginBottom: 6 }}>🛞 Wheel paint</div>
+      <Fieldset legend="Wheel paint">
         <SwatchRow
           paints={[...paints, 'ink']}
           selected={design.paint.wheels}
           onPick={(wheels) => setPaint({ wheels })}
         />
+      </Fieldset>
+
+      <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+        <Fieldset legend="Racing number">
+          <Btn size="sm" onClick={() => setNumber((design.number + 99) % 100)} title="lower">
+            <IconMinus size={16} />
+          </Btn>
+          <div
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: '1.7rem',
+              minWidth: 58,
+              textAlign: 'center',
+              border: '2px solid var(--ink)',
+              borderRadius: 2,
+              background: 'var(--paper)',
+              padding: '2px 8px',
+            }}
+          >
+            {design.number}
+          </div>
+          <Btn size="sm" onClick={() => setNumber((design.number + 1) % 100)} title="higher">
+            <IconPlus size={16} />
+          </Btn>
+        </Fieldset>
+
+        <Fieldset legend="Car name" style={{ flex: 1, minWidth: 220 }}>
+          <input
+            value={design.name}
+            onChange={(e) => setName(e.target.value)}
+            style={{
+              flex: 1,
+              fontFamily: 'var(--font-label)',
+              fontSize: '1.05rem',
+              fontWeight: 500,
+              letterSpacing: '0.04em',
+              padding: '8px 12px',
+              border: '2px solid var(--ink)',
+              borderRadius: 2,
+              background: 'var(--paper)',
+              color: 'var(--ink)',
+              minWidth: 120,
+            }}
+          />
+          <Btn size="sm" onClick={() => setName(generateCarName())} title="random name">
+            <IconDice size={18} />
+          </Btn>
+        </Fieldset>
       </div>
 
-      <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
-        <div>
-          <div style={{ fontWeight: 900, marginBottom: 6 }}>🔢 Racing number</div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <Btn variant="paper" onClick={() => setNumber((design.number + 99) % 100)}>
-              −
-            </Btn>
-            <div
+      <Fieldset legend="Stickers — tap a spot to change it">
+        {DECAL_SLOTS.map((slot) => {
+          const current = design.decals.find((d) => d.slot === slot)
+          const url = current ? stickerDataURL(current.decalId) : null
+          return (
+            <button
+              key={slot}
+              onClick={() => cycleDecal(slot)}
               style={{
-                fontSize: '2rem',
-                fontWeight: 900,
-                minWidth: 64,
-                textAlign: 'center',
+                width: 76,
+                border: '2px solid var(--ink)',
+                borderRadius: 2,
                 background: 'var(--paper)',
-                border: '3px solid var(--ink)',
-                borderRadius: 12,
-                padding: '2px 10px',
+                padding: '6px 4px 5px',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 3,
+                cursor: 'pointer',
               }}
+              title={current ? DECALS.find((d) => d.id === current.decalId)?.name : 'add a sticker'}
             >
-              {design.number}
-            </div>
-            <Btn variant="paper" onClick={() => setNumber((design.number + 1) % 100)}>
-              +
-            </Btn>
-          </div>
-        </div>
-
-        <div style={{ flex: 1, minWidth: 220 }}>
-          <div style={{ fontWeight: 900, marginBottom: 6 }}>📛 Car name</div>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <input
-              value={design.name}
-              onChange={(e) => setName(e.target.value)}
-              style={{
-                flex: 1,
-                fontSize: '1.15rem',
-                fontWeight: 800,
-                fontFamily: 'inherit',
-                padding: '10px 12px',
-                border: '3px solid var(--ink)',
-                borderRadius: 12,
-                background: 'var(--paper)',
-                color: 'var(--ink)',
-              }}
-            />
-            <Btn variant="paper" onClick={() => setName(generateCarName())} title="random name">
-              🎲
-            </Btn>
-          </div>
-        </div>
-      </div>
-
-      <div>
-        <div style={{ fontWeight: 900, marginBottom: 2 }}>✨ Stickers</div>
-        <div style={{ color: 'var(--navy)', fontWeight: 600, fontSize: '0.92rem', marginBottom: 8 }}>
-          Tap a spot to change its sticker.
-        </div>
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          {DECAL_SLOTS.map((slot) => {
-            const current = design.decals.find((d) => d.slot === slot)
-            const glyph = decals.find((d) => d.id === current?.decalId)?.glyph
-            return (
-              <Btn key={slot} variant="paper" onClick={() => cycleDecal(slot)}>
-                <span style={{ fontSize: '1.5rem' }}>{glyph ?? '➕'}</span>
-                <div style={{ fontSize: '0.75rem', fontWeight: 700 }}>{SLOT_LABELS[slot]}</div>
-              </Btn>
-            )
-          })}
-        </div>
-      </div>
+              <div style={{ width: 34, height: 34, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {url ? (
+                  <img src={url} width={34} height={34} alt="" />
+                ) : (
+                  <IconPlus size={20} style={{ opacity: 0.45 }} />
+                )}
+              </div>
+              <span className="lp-label" style={{ fontSize: '0.58rem' }}>
+                {SLOT_LABELS[slot]}
+              </span>
+            </button>
+          )
+        })}
+      </Fieldset>
     </div>
   )
 }
@@ -139,12 +149,12 @@ function SwatchRow({
           key={id}
           onClick={() => onPick(id)}
           style={{
-            width: 46,
-            height: 46,
-            borderRadius: 12,
+            width: 42,
+            height: 42,
+            borderRadius: 2,
             background: PALETTE[id],
-            border: selected === id ? '4px solid var(--ink)' : '3px solid rgba(33,29,22,0.35)',
-            boxShadow: selected === id ? '0 3px 0 var(--ink)' : 'none',
+            border: '2px solid var(--ink)',
+            boxShadow: selected === id ? 'inset 0 0 0 3px var(--paper), inset 0 0 0 5px var(--ink)' : 'none',
             cursor: 'pointer',
           }}
           title={id}

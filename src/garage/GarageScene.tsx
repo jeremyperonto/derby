@@ -28,8 +28,8 @@ export function GarageScene() {
         </group>
         {/* display stand */}
         <mesh position={[0, -0.15, 0]}>
-          <cylinderGeometry args={[4.4, 4.8, 0.3, 24]} />
-          <meshStandardMaterial color={PALETTE.mustard} flatShading />
+          <cylinderGeometry args={[4.3, 4.6, 0.3, 28]} />
+          <meshStandardMaterial color={PALETTE.kraft} flatShading />
         </mesh>
         {/* soft blob shadow */}
         <mesh position={[0, 0.011, 0]} rotation={[-Math.PI / 2, 0, 0]}>

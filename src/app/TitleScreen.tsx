@@ -2,10 +2,14 @@ import { useAppStore } from '../state/appStore'
 import { useProgressStore } from '../state/progressStore'
 import { useSettingsStore } from '../state/settingsStore'
 import { Btn } from '../ui/Btn'
+import { IconFlag, IconSound, IconSoundOff, IconVoice, IconWrench } from '../ui/icons'
+import { CrossedFlags, DiamondRule, EstPlaque, SpeedRules } from '../ui/ornaments'
 
-const CHECKER =
-  'repeating-conic-gradient(var(--ink) 0% 25%, var(--paper) 0% 50%) 0 0 / 28px 28px'
-
+/**
+ * Title screen: a one-ink badge lockup straight from the reference posters
+ * (crossed checkered flags, arched letterspaced line, big Rye display,
+ * script tagline, speed rules) over the rotating car showcase.
+ */
 export function TitleScreen() {
   const setScreen = useAppStore((s) => s.setScreen)
   const defeated = useProgressStore((s) => s.defeated)
@@ -22,101 +26,106 @@ export function TitleScreen() {
         flexDirection: 'column',
         alignItems: 'center',
         pointerEvents: 'none',
+        color: 'var(--ink)',
       }}
     >
-      {/* checkered top & bottom ribbons */}
-      <div style={{ height: 18, width: '100%', background: CHECKER }} />
-
+      {/* badge lockup */}
       <div
         style={{
-          flex: 1,
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          justifyContent: 'flex-start',
-          paddingTop: '7vh',
-          gap: 14,
+          paddingTop: '4.5vh',
+          gap: 4,
         }}
       >
-        {/* sunburst behind the title */}
-        <div
+        <CrossedFlags width={190} />
+
+        {/* arched top line */}
+        <svg width={460} height={46} viewBox="0 0 460 46" style={{ marginTop: -6, maxWidth: '94vw' }}>
+          <path id="title-arch" d="M 16 42 Q 230 4 444 42" fill="none" />
+          <text
+            className="lp-label"
+            style={{ fontSize: 15, letterSpacing: '0.34em', fill: 'var(--ink)' }}
+          >
+            <textPath href="#title-arch" startOffset="50%" textAnchor="middle">
+              PINEWOOD PHYSICS SPEEDWAY
+            </textPath>
+          </text>
+        </svg>
+
+        <h1
           style={{
-            position: 'relative',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            padding: '30px 60px',
+            fontFamily: 'var(--font-display)',
+            fontWeight: 400,
+            fontSize: 'clamp(2.6rem, 8.5vw, 5rem)',
+            lineHeight: 0.95,
+            letterSpacing: '0.02em',
+            color: 'var(--brick-red)',
+            textShadow: '2.5px 2.5px 0 var(--ink)',
+            textAlign: 'center',
+            margin: '2px 0 0',
           }}
         >
-          <div
-            style={{
-              position: 'absolute',
-              inset: -40,
-              background:
-                'repeating-conic-gradient(rgba(217,160,63,0.35) 0deg 9deg, transparent 9deg 18deg)',
-              borderRadius: '50%',
-              filter: 'blur(1px)',
-            }}
-          />
-          <h1
-            style={{
-              position: 'relative',
-              fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(2.6rem, 9vw, 5.5rem)',
-              letterSpacing: '0.03em',
-              color: 'var(--brick-red)',
-              textShadow: '5px 5px 0 var(--ink)',
-              textTransform: 'uppercase',
-              textAlign: 'center',
-              lineHeight: 1.05,
-            }}
-          >
-            Derby
-            <br />
-            Dash
-          </h1>
+          DERBY DASH
+        </h1>
+
+        {/* DERBY-style ruled line with the year plaque */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 8 }}>
+          <SpeedRules width={54} height={14} />
+          <EstPlaque>EST. 2026</EstPlaque>
+          <div style={{ transform: 'scaleX(-1)', display: 'flex' }}>
+            <SpeedRules width={54} height={14} />
+          </div>
         </div>
 
-        <p style={{ color: 'var(--navy)', fontSize: '1.15rem', fontWeight: 800 }}>
-          🏁 carve it · race it · learn why it won 🏁
-        </p>
+        <div
+          style={{
+            fontFamily: 'var(--font-script)',
+            fontSize: 'clamp(1.3rem, 3.4vw, 1.9rem)',
+            color: 'var(--navy)',
+            marginTop: 6,
+            transform: 'rotate(-2deg)',
+          }}
+        >
+          carve it &middot; race it &middot; learn why it won
+        </div>
+      </div>
 
-        <div style={{ marginTop: '3vh', display: 'flex', gap: 12, pointerEvents: 'auto' }}>
-          <Btn
-            variant="red"
-            onClick={() => setScreen('garage')}
-            style={{ fontSize: '1.5rem', padding: '16px 32px', fontFamily: 'var(--font-display)' }}
-          >
-            🔨 Let&apos;s Build!
+      {/* actions */}
+      <div style={{ marginTop: 'auto', paddingBottom: '7vh', display: 'flex', gap: 14, pointerEvents: 'auto' }}>
+        <Btn variant="red" size="lg" onClick={() => setScreen('garage')}>
+          <IconWrench size={22} /> Let&rsquo;s Build
+        </Btn>
+        {defeated.length > 0 && (
+          <Btn variant="ink" size="lg" onClick={() => setScreen('rivalSelect')}>
+            <IconFlag size={22} /> Race
           </Btn>
-          {defeated.length > 0 && (
-            <Btn
-              variant="navy"
-              onClick={() => setScreen('rivalSelect')}
-              style={{ fontSize: '1.5rem', padding: '16px 32px', fontFamily: 'var(--font-display)' }}
-            >
-              🏁 Race!
-            </Btn>
-          )}
-        </div>
+        )}
+      </div>
+
+      <div style={{ paddingBottom: 16, color: 'var(--ink)' }}>
+        <DiamondRule width={230} />
       </div>
 
       {/* settings corner */}
-      <div style={{ position: 'absolute', right: 14, bottom: 30, display: 'flex', gap: 8, pointerEvents: 'auto' }}>
-        <Btn variant="paper" onClick={() => setMuted(!muted)} title="sound">
-          {muted ? '🔇' : '🔊'}
+      <div
+        style={{
+          position: 'absolute',
+          right: 14,
+          bottom: 14,
+          display: 'flex',
+          gap: 8,
+          pointerEvents: 'auto',
+        }}
+      >
+        <Btn size="sm" onClick={() => setMuted(!muted)} title="sound">
+          {muted ? <IconSoundOff size={18} /> : <IconSound size={18} />}
         </Btn>
-        <Btn
-          variant="paper"
-          active={narration}
-          onClick={() => setNarration(!narration)}
-          title="read tips aloud"
-        >
-          🗣️
+        <Btn size="sm" active={narration} onClick={() => setNarration(!narration)} title="read tips aloud">
+          <IconVoice size={18} />
         </Btn>
       </div>
-
-      <div style={{ height: 18, width: '100%', background: CHECKER }} />
     </div>
   )
 }

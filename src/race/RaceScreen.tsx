@@ -38,7 +38,7 @@ export function RaceScreen() {
       )}
       {count === 0 && playback.t < 0.9 && (
         <CenterText color="var(--mustard)" small tilt>
-          GO! 🏁
+          GO!
         </CenterText>
       )}
       {playback.phase === 'replay' && !playback.frozen && (
@@ -65,7 +65,7 @@ export function RaceScreen() {
               transform: 'rotate(-2deg)',
             }}
           >
-            📼 LET&apos;S SEE THAT AGAIN!
+            LET&rsquo;S SEE THAT AGAIN!
           </div>
         </div>
       )}
@@ -103,7 +103,7 @@ export function RaceScreen() {
                 transform: 'rotate(-3deg)',
               }}
             >
-              📸 PHOTO FINISH!
+              PHOTO FINISH!
             </div>
           </div>
         </>

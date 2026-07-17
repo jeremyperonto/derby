@@ -241,15 +241,20 @@ No URL router — a screen state machine (also avoids GitHub Pages SPA-refresh 4
 
 Car paints draw from the same family (several unlockable). The 3D world uses these as flat material colors — no realistic texturing; the vintage tint IS the lighting mood.
 
-### Type & texture
+### Type & letterpress system
 
-- **Display**: chunky retro slab/display face for titles, numbers, trophies (block-letter "DERBY" energy, subtle drop shadow).
-- **Body/UI**: rounded friendly sans, generous size.
-- **Texture**: subtle paper-grain/distress overlay on UI panels (never on the 3D viewport); sunburst rays behind trophies and title; checkered-flag borders; bunting.
+Reference boards: Dustin Commer's *1st Annual Pinewood Derby* badge, Commence Studio's *Derby Barber* tearsheet, James David Horton's *RedBull Soap Box Racer* illustration. One-ink letterpress discipline throughout:
+
+- **Display**: Rye (woodtype carnival serif) — titles, headers, car numbers. Brick red with a thin ink shadow for heroes; plain ink elsewhere.
+- **Labels/UI**: Oswald, uppercase, letterspaced 0.12–0.14em (the `lp-label` class) — every button, tab, legend, and chip.
+- **Script accents**: Yellowtail — taglines and rival quips ("so close!", "carve it · race it").
+- **Prose**: Georgia/serif italic — read-aloud text (intros, Pit Crew Notes, balance hints).
+- **Controls**: ink-on-paper plaques with double-rule borders (2px ink + inner hairline), squared corners, filled-ink active states, segmented option groups inside legended fieldsets. Primary action = brick-red plaque. NO chunky rounded corners, NO fat offset shadows, NO emoji anywhere — all iconography is the hand-drawn stroke SVG set (`ui/icons.tsx`), stickers/medals are canvas-drawn vectors (`garage/carDecals.ts`).
+- **Ornaments**: crossed checkered wing flags, arched SVG text, triple speed rules, diamond rules, EST plaques (`ui/ornaments.tsx`).
 
 ### Motion & feel
 
-Chunky and springy: buttons squash on press, cars bounce softly when placed, confetti on wins, the flag-drop snaps. Nothing hovers-only; everything responds to touch with sound + motion.
+Presses nudge 1px (letterpress, not squash); the title showcase car squash-swaps between builds; cars bounce softly when placed; confetti on wins; the flag-drop snaps. Nothing hovers-only; everything responds to touch with sound + motion.
 
 ### 3D style
 

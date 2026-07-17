@@ -7,7 +7,8 @@ export type LessonId = 'carve' | 'weight' | 'placement' | 'friction' | 'aero' | 
 
 export interface Lesson {
   id: LessonId
-  icon: string
+  /** id into the SVG icon set (ui/icons.tsx LESSON_ICONS) */
+  icon: 'saw' | 'scale' | 'weightBack' | 'sparkle' | 'wind' | 'lift'
   title: string
   kidLine: string
   /** concrete post-race tip template; {gain} = car lengths gained */
@@ -19,7 +20,7 @@ export interface Lesson {
 export const LESSONS: Record<LessonId, Lesson> = {
   carve: {
     id: 'carve',
-    icon: '🔪',
+    icon: 'saw',
     title: 'Carve it!',
     kidLine: 'A block is not a race car yet — carve it and make it yours!',
     tipLine: 'Carving your car sleeker would have helped — try the carve station!',
@@ -29,7 +30,7 @@ export const LESSONS: Record<LessonId, Lesson> = {
   },
   weight: {
     id: 'weight',
-    icon: '⚖️',
+    icon: 'scale',
     title: 'Heavy is fast',
     kidLine: 'Heavy cars push harder down the hill — load it up to the 5 oz limit!',
     tipLine: 'Adding weight up to 5 oz would have won it by {gain}!',
@@ -39,7 +40,7 @@ export const LESSONS: Record<LessonId, Lesson> = {
   },
   placement: {
     id: 'placement',
-    icon: '🔙',
+    icon: 'weightBack',
     title: 'Heavy in the BACK',
     kidLine: 'Put the weight in the back — it rides the hill longer, like scooting back on a slide!',
     tipLine: 'Moving your weights to the back would have won it by {gain}!',
@@ -49,7 +50,7 @@ export const LESSONS: Record<LessonId, Lesson> = {
   },
   friction: {
     id: 'friction',
-    icon: '✨',
+    icon: 'sparkle',
     title: 'Smooth is fast',
     kidLine: 'Rough and squeaky rubs your speed away — polish those axles and puff the graphite!',
     tipLine: 'Polishing the axles and adding graphite would have won it by {gain}!',
@@ -59,7 +60,7 @@ export const LESSONS: Record<LessonId, Lesson> = {
   },
   aero: {
     id: 'aero',
-    icon: '🌬️',
+    icon: 'wind',
     title: 'Slip through the air',
     kidLine: 'The air is in the way! Pointy, low cars sneak through — brick cars have to shove it aside.',
     tipLine: 'A sleeker, lower shape would have won it by {gain}!',
@@ -69,7 +70,7 @@ export const LESSONS: Record<LessonId, Lesson> = {
   },
   wheels: {
     id: 'wheels',
-    icon: '🎈',
+    icon: 'lift',
     title: 'Three shoes rub less than four',
     kidLine: 'Lift one front wheel off the track — three wheels rub less than four!',
     tipLine: 'Raising one front wheel would have found you {gain} more!',

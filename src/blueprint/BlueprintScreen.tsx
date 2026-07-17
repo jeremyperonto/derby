@@ -1,5 +1,7 @@
 import { decalById, SLOT_LABELS } from '../content/decals'
+import { stickerDataURL } from '../garage/carDecals'
 import { PALETTE } from '../content/palette'
+import { IconArrowLeft, IconPrint } from '../ui/icons'
 import { AXLE_X_IN, MAX_WEIGHT_OZ, PLUG_OZ, WEIGHT_SLOTS } from '../model/carDesign'
 import { useAppStore } from '../state/appStore'
 import { useGarageStore } from '../state/garageStore'
@@ -34,12 +36,12 @@ export function BlueprintScreen() {
     >
       {/* controls (hidden in print) */}
       <div className="no-print" style={{ display: 'flex', gap: 10, marginBottom: 12 }}>
-        <Btn variant="paper" onClick={() => setScreen('garage')}>
-          ⬅ Garage
+        <Btn onClick={() => setScreen('garage')}>
+          <IconArrowLeft size={17} /> Garage
         </Btn>
         <div style={{ flex: 1 }} />
-        <Btn variant="red" onClick={() => window.print()} style={{ fontSize: '1.2rem' }}>
-          🖨️ Print the plans!
+        <Btn variant="red" size="lg" onClick={() => window.print()}>
+          <IconPrint size={19} /> Print the plans
         </Btn>
       </div>
 
@@ -207,17 +209,21 @@ export function BlueprintScreen() {
               <>
                 <SectionTitle>STICKERS</SectionTitle>
                 <div style={{ fontWeight: 700, fontSize: '0.95rem' }}>
-                  {design.decals.map((d) => (
-                    <div key={d.slot}>
-                      {decalById(d.decalId)?.glyph} {decalById(d.decalId)?.name} — {SLOT_LABELS[d.slot]}
-                    </div>
-                  ))}
+                  {design.decals.map((d) => {
+                    const url = stickerDataURL(d.decalId)
+                    return (
+                      <div key={d.slot} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        {url && <img src={url} width={18} height={18} alt="" />}
+                        {decalById(d.decalId)?.name} — {SLOT_LABELS[d.slot]}
+                      </div>
+                    )
+                  })}
                 </div>
               </>
             )}
 
             <div style={{ marginTop: 'auto', fontWeight: 700, fontSize: '0.85rem', borderTop: '2px solid var(--ink)', paddingTop: 6 }}>
-              Built in Derby Dash 🏁 — tape the side view to a 7″ × 1¾″ × 1¼″ pine block and cut just outside the line.
+              Built in Derby Dash — tape the side view to a 7″ × 1¾″ × 1¼″ pine block and cut just outside the line.
             </div>
           </div>
         </div>

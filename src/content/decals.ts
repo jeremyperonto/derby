@@ -1,26 +1,25 @@
 import type { DecalSlot } from '../model/carDesign'
 
 /**
- * Sticker registry — emoji glyphs drawn onto small canvas textures: zero
- * asset work, instantly kid-readable. Some unlock via the rivals ladder.
+ * Sticker registry — every sticker is a hand-drawn canvas vector (see
+ * garage/carDecals.ts), no emoji. Some unlock via the rivals ladder.
  */
 export interface Decal {
   id: string
-  glyph: string
   name: string
 }
 
 export const DECALS: Decal[] = [
-  { id: 'flame', glyph: '🔥', name: 'Flames' },
-  { id: 'bolt', glyph: '⚡', name: 'Lightning' },
-  { id: 'star', glyph: '⭐', name: 'Star' },
-  { id: 'checker', glyph: '🏁', name: 'Checkers' },
-  { id: 'rocket', glyph: '🚀', name: 'Rocket' },
-  { id: 'heart', glyph: '❤️', name: 'Heart' },
-  { id: 'eyes', glyph: '👀', name: 'Eyes' },
-  { id: 'boom', glyph: '💥', name: 'Ka-boom' },
-  { id: 'clover', glyph: '🍀', name: 'Lucky Clover' },
-  { id: 'skull', glyph: '☠️', name: 'Jolly Roger' },
+  { id: 'flame', name: 'Flames' },
+  { id: 'bolt', name: 'Lightning' },
+  { id: 'star', name: 'Star' },
+  { id: 'heart', name: 'Heart' },
+  { id: 'checker', name: 'Checkers' },
+  { id: 'stripes', name: 'Racing Stripes' },
+  { id: 'eyes', name: 'Googly Eyes' },
+  { id: 'boom', name: 'Ka-boom' },
+  { id: 'clover', name: 'Lucky Clover' },
+  { id: 'arrow', name: 'Speed Arrows' },
 ]
 
 export const decalById = (id: string) => DECALS.find((d) => d.id === id)

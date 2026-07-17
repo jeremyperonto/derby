@@ -1,7 +1,7 @@
-import { lazy, Suspense, useRef } from 'react'
-import { Canvas, useFrame } from '@react-three/fiber'
-import type { Group } from 'three'
+import { lazy, Suspense } from 'react'
+import { Canvas } from '@react-three/fiber'
 import { TitleScreen } from './app/TitleScreen'
+import { TitleShowcase } from './app/TitleShowcase'
 import { BlueprintScreen } from './blueprint/BlueprintScreen'
 import { PALETTE } from './content/palette'
 import { GarageScene } from './garage/GarageScene'
@@ -20,31 +20,16 @@ const TuningPanel = lazy(() => import('./app/TuningPanel'))
 // toDataURL; stable module-level identity so the renderer is never rebuilt
 const GL_OPTIONS = { preserveDrawingBuffer: import.meta.env.DEV } as const
 
-/** Title-screen hero: a slowly tumbling raw pine block, waiting to be carved. */
-function TitleBlock() {
-  const group = useRef<Group>(null)
-  useFrame((_, delta) => {
-    if (group.current) group.current.rotation.y += delta * 0.5
-  })
-  return (
-    <group ref={group} rotation={[0.15, 0, 0.04]}>
-      <mesh>
-        <boxGeometry args={[7, 1.25, 1.75]} />
-        <meshStandardMaterial color={PALETTE.pine} flatShading />
-      </mesh>
-    </group>
-  )
-}
-
 /** 3D content per screen, inside the ONE persistent Canvas (never unmounted). */
 function SceneRouter() {
   const screen = useAppStore((s) => s.screen)
   return (
     <>
-      <color attach="background" args={[PALETTE.skyBlue]} />
+      {/* one cream-paper sky everywhere — the whole game lives on the poster */}
+      <color attach="background" args={[PALETTE.paper]} />
       <hemisphereLight args={[PALETTE.paper, PALETTE.kraft, 0.9]} />
       <directionalLight position={[4, 8, 6]} intensity={1.2} />
-      {(screen === 'title' || screen === 'tuning') && <TitleBlock />}
+      {(screen === 'title' || screen === 'tuning') && <TitleShowcase />}
       {screen === 'garage' && <GarageScene />}
       {(screen === 'race' || screen === 'results') && (
         <>

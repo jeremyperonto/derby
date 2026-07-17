@@ -184,8 +184,8 @@ export function CarveView() {
       )}
 
       {/* nose label */}
-      <text x={0.06} y={-0.12} fontSize={0.24} fill="var(--ink)" fontWeight={700}>
-        {view === 'side' ? '⬅ nose · side view' : '⬅ nose · top view'}
+      <text x={0.06} y={-0.12} fontSize={0.2} fill="var(--ink)" fontWeight={600} fontFamily="Oswald, sans-serif" letterSpacing={0.03}>
+        {view === 'side' ? '« NOSE — SIDE VIEW' : '« NOSE — TOP VIEW'}
       </text>
     </svg>
   )

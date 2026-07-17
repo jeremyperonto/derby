@@ -10,10 +10,22 @@
   --pine: #e6c98f;
   --forest: #4a6b4f;
 
-  --font-display: 'Alfa Slab One', 'Trebuchet MS', system-ui, serif;
+  /* letterpress type system — see the Dribbble refs in design.md §9 */
+  --font-display: 'Rye', 'Georgia', serif; /* woodtype carnival display */
+  --font-label: 'Oswald', 'Arial Narrow', sans-serif; /* letterspaced gothic caps */
+  --font-script: 'Yellowtail', cursive; /* signpainter accents */
+  --font-prose: Georgia, 'Times New Roman', serif; /* longer read-aloud text */
 
-  font-family: 'Trebuchet MS', 'Comic Sans MS', system-ui, sans-serif;
+  font-family: var(--font-label);
   color: var(--ink);
+}
+
+/* letterspaced small-caps label, the workhorse style */
+.lp-label {
+  font-family: var(--font-label);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 600;
 }
 
 @keyframes photoflash {

@@ -18,7 +18,6 @@ import { TEMPLATES } from './templates'
 export interface Rival {
   id: string
   name: string
-  portrait: string
   tagline: string
   intro: string
   lesson: LessonId
@@ -61,7 +60,6 @@ export const RIVALS: Rival[] = [
   {
     id: 'bobby',
     name: 'Brick Bobby',
-    portrait: '🧱',
     tagline: '“Carving is for quitters.”',
     intro: 'Bobby says his block is already perfect. Is a block a race car?',
     lesson: 'carve',
@@ -75,7 +73,6 @@ export const RIVALS: Rival[] = [
   {
     id: 'flo',
     name: 'Featherweight Flo',
-    portrait: '🪶',
     tagline: '“Light as a feather, fast as a… feather?”',
     intro: 'Flo carved a beautiful car but skipped the weights. Heavy or light — which pushes harder down a hill?',
     lesson: 'weight',
@@ -89,7 +86,6 @@ export const RIVALS: Rival[] = [
   {
     id: 'ned',
     name: 'Nose-Heavy Ned',
-    portrait: '🐘',
     tagline: '“The front is the fast part!”',
     intro: 'Ned crammed every weight into the nose. Does the front of the hill or the back of the hill push longer?',
     lesson: 'placement',
@@ -110,7 +106,6 @@ export const RIVALS: Rival[] = [
   {
     id: 'pete',
     name: 'Squeaky Pete',
-    portrait: '🐭',
     tagline: '“You can hear me coming!”',
     intro: 'Pete never polishes anything. Listen to those axles squeak — where is his speed going?',
     lesson: 'friction',
@@ -131,7 +126,6 @@ export const RIVALS: Rival[] = [
   {
     id: 'barb',
     name: 'Barn-Door Barb',
-    portrait: '🚪',
     tagline: '“The air can move for ME.”',
     intro: 'Barb did everything right — except her car is a tall brick. Who has to shove more air out of the way?',
     lesson: 'aero',
@@ -153,7 +147,6 @@ export const RIVALS: Rival[] = [
   {
     id: 'lena',
     name: 'Lightning Lena',
-    portrait: '⚡',
     tagline: '“Catch me if you can.”',
     intro: 'The champ. Sleek, heavy in the back, polished, graphited — and she rides on three wheels. Bring everything you know.',
     lesson: 'wheels',

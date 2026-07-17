@@ -8,7 +8,6 @@ import type { CarveOp } from '../model/carDesign'
 export interface Template {
   id: string
   name: string
-  icon: string
   ops: CarveOp[]
 }
 
@@ -16,7 +15,6 @@ export const TEMPLATES: Template[] = [
   {
     id: 'wedge',
     name: 'Wedge',
-    icon: '📐',
     ops: [
       { t: 'slice', view: 'side', ax: 0, ay: 0.3, bx: 7, by: 1.2 },
       { t: 'round', r: 0.12 },
@@ -25,7 +23,6 @@ export const TEMPLATES: Template[] = [
   {
     id: 'speeder',
     name: 'Speeder',
-    icon: '🚀',
     ops: [
       // low sleek nose rising to a mid deck…
       { t: 'slice', view: 'side', ax: 0, ay: 0.28, bx: 3.4, by: 0.75 },
@@ -49,7 +46,6 @@ export const TEMPLATES: Template[] = [
   {
     id: 'bathtub',
     name: 'Bathtub',
-    icon: '🛁',
     ops: [
       // keep high walls, hollow out the middle like a classic bathtub racer
       {
