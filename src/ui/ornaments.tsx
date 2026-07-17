@@ -62,46 +62,54 @@ export function StarColumn({ size = 34 }: { size?: number }) {
   )
 }
 
-/** crossed checkered wing flags (title lockup) */
+/**
+ * Checkered wings + star column — the crossed-flag lockup from the
+ * reference badge, built from skewed parallelograms so the checker grid
+ * is registered to the wing by construction.
+ */
 export function CrossedFlags({ width = 220 }: { width?: number }) {
-  const h = width * 0.36
+  const CELL = 8
+  const COLS = 5
+  const ROWS = 3
+  const wingW = CELL * COLS
+  const wingH = CELL * ROWS
+
+  const wing = (
+    <g>
+      {/* checker cells (paper base + ink alternates) */}
+      <rect x={0} y={0} width={wingW} height={wingH} fill="var(--paper)" />
+      {Array.from({ length: COLS }, (_, i) =>
+        Array.from({ length: ROWS }, (_, j) =>
+          (i + j) % 2 === 0 ? (
+            <rect key={`${i}-${j}`} x={i * CELL} y={j * CELL} width={CELL} height={CELL} fill="currentColor" />
+          ) : null,
+        ),
+      )}
+      <rect x={0} y={0} width={wingW} height={wingH} fill="none" stroke="currentColor" strokeWidth={2.4} />
+    </g>
+  )
+
   return (
-    <svg width={width} height={h} viewBox="0 0 220 80" fill="none" stroke="currentColor">
-      {/* poles */}
-      <line x1={38} y1={74} x2={104} y2={18} strokeWidth={3} />
-      <line x1={182} y1={74} x2={116} y2={18} strokeWidth={3} />
-      {/* left flag: waving parallelogram with checker grid */}
-      <g>
-        <path d="M96 24 42 62 22 40 76 8z" fill="var(--paper)" strokeWidth={2.5} strokeLinejoin="round" />
-        <Checkers ox={22} oy={8} dirX={[18, -13]} dirY={[7, 11]} />
-      </g>
-      <g>
-        <path d="M124 24 178 62 198 40 144 8z" fill="var(--paper)" strokeWidth={2.5} strokeLinejoin="round" />
-        <Checkers ox={198} oy={8} dirX={[-18, -13]} dirY={[-7, 11]} />
-      </g>
+    <svg width={width} height={width * 0.31} viewBox="0 0 220 68" fill="none">
+      {/* right wing rises outward; left is its mirror */}
+      <g transform="translate(121,32) skewY(-14)">{wing}</g>
+      <g transform="translate(99,32) scale(-1,1) skewY(-14)">{wing}</g>
+      {/* star column between the wings */}
+      <polygon points={starPoints(110, 22, 8)} fill="currentColor" />
+      <polygon points={starPoints(110, 41, 5.5)} fill="currentColor" />
+      <polygon points={starPoints(110, 56, 4.2)} fill="currentColor" />
     </svg>
   )
 }
 
-/** 4×3 checker fill for the flags, drawn as filled parallelogram cells */
-function Checkers({ ox, oy, dirX, dirY }: { ox: number; oy: number; dirX: [number, number]; dirY: [number, number] }) {
-  const cells = []
-  for (let i = 0; i < 4; i++) {
-    for (let j = 0; j < 3; j++) {
-      if ((i + j) % 2 === 0) continue
-      const x = ox + dirX[0] * i + dirY[0] * j
-      const y = oy + dirX[1] * i + dirY[1] * j
-      cells.push(
-        <path
-          key={`${i}-${j}`}
-          d={`M ${x} ${y} l ${dirX[0]} ${dirX[1]} l ${dirY[0]} ${dirY[1]} l ${-dirX[0]} ${-dirX[1]} z`}
-          fill="currentColor"
-          stroke="none"
-        />,
-      )
-    }
+function starPoints(cx: number, cy: number, r: number): string {
+  const pts: string[] = []
+  for (let i = 0; i < 10; i++) {
+    const a = -Math.PI / 2 + (i * Math.PI) / 5
+    const rr = i % 2 === 0 ? r : r * 0.42
+    pts.push(`${(cx + rr * Math.cos(a)).toFixed(1)},${(cy + rr * Math.sin(a)).toFixed(1)}`)
   }
-  return <>{cells}</>
+  return pts.join(' ')
 }
 
 /** small ruled plaque like the badge's "EST 2015" chip */
