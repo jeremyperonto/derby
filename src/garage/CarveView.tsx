@@ -37,7 +37,7 @@ export function CarveView() {
   const gesture = useRef<{ start: [number, number]; stroke: [number, number][] } | null>(null)
 
   const H = view === 'side' ? BLOCK.heightIn : BLOCK.widthIn
-  const PAD = 0.35
+  const PAD = 0.45
 
   /** pointer event → inch coords in profile space (y up from block bottom / centerline) */
   const toInches = (e: PointerEvent<SVGSVGElement>): [number, number] | null => {
@@ -61,8 +61,14 @@ export function CarveView() {
   const onDown = (e: PointerEvent<SVGSVGElement>) => {
     const p = toInches(e)
     if (!p) return
-    e.currentTarget.setPointerCapture(e.pointerId)
+    // gesture FIRST — capture is best-effort and can throw ("no active
+    // pointer") on some first interactions; carving must survive that
     gesture.current = { start: p, stroke: [p] }
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId)
+    } catch {
+      /* drags just won't track outside the panel — fine */
+    }
     if (tool !== 'slice') setDraft(draftFor(p, [p], p))
   }
 
@@ -123,10 +129,15 @@ export function CarveView() {
   const sliceDraft = draftOp?.t === 'slice' ? draftOp : null
 
   return (
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', gap: 4 }}>
+      {/* caption lives OUTSIDE the drawing so it can never overlap it */}
+      <div className="lp-label" style={{ fontSize: '0.66rem', color: 'var(--navy)' }}>
+        « nose — {view === 'side' ? 'side view' : 'top view · dashed boxes show where the wheels mount'}
+      </div>
     <svg
       ref={svgRef}
       viewBox={`${-PAD} ${-PAD} ${BLOCK.lengthIn + 2 * PAD} ${H + 2 * PAD}`}
-      style={{ width: '100%', height: '100%', touchAction: 'none', display: 'block' }}
+      style={{ width: '100%', flex: 1, minHeight: 0, touchAction: 'none', display: 'block' }}
       onPointerDown={onDown}
       onPointerMove={onMove}
       onPointerUp={onUp}
@@ -226,11 +237,8 @@ export function CarveView() {
         />
       )}
 
-      {/* nose label */}
-      <text x={0.06} y={-0.12} fontSize={0.2} fill="var(--ink)" fontWeight={600} fontFamily="Oswald, sans-serif" letterSpacing={0.03}>
-        {view === 'side' ? '« NOSE — SIDE VIEW' : '« NOSE — TOP VIEW'}
-      </text>
     </svg>
+    </div>
   )
 }
 
