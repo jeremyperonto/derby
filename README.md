@@ -6,7 +6,7 @@ Derby Dash is a Pinewood Derby simulator for kids — a web game where you carve
 
 > 🖨️ **The best part:** when you build a car you love, Derby Dash prints a true-to-scale shop blueprint — profiles, weight placement, wheel prep checklist — so you can build the real thing together.
 
-**Play it:** https://jeremyperonto.com/derby/ *(coming soon)*
+**Play it:** https://jeremyperonto.com/derby/
 
 ![Derby Dash screenshot](docs/screenshot.png) <!-- TODO: replace with a real screenshot at v1 -->
 

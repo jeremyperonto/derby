@@ -45,14 +45,16 @@ The garage has five stations, arranged as big tap targets styled like a vintage 
 
 The kid starts with a **block of pine at real BSA kit dimensions: 7" long × 1.75" wide × 1.25" tall**, shown in side view or top view (toggle), with a live 3D preview.
 
-**Tools** (all drag gestures, chunky cursors, satisfying sounds):
+**Tools** (all drag gestures, chunky cursors, satisfying sounds; UI icons are stroke SVGs, no emoji):
 
 | Tool | Gesture | What it does |
 |---|---|---|
-| 🔪 **Slice** | drag a straight line | Removes everything above the line (side) / outside the line (top) — one clean bandsaw cut |
-| 🥄 **Scoop** | drag a curve | Carves a concave groove following the finger, like a gouge |
-| 🧽 **Sand** | rub back and forth | Smooths and rounds — knocks down high spots, fillets corners |
-| ⭕ **Round edges** | slider | Rounds the four long edges of the body (also an aero factor) |
+| **Slice** | drag a straight line | Removes everything above the line (side) / outside the line (top) — one clean bandsaw cut |
+| **Scoop** | drag a curve | Carves a concave groove following the finger, like a gouge |
+| **Sand** | rub back and forth | Smooths and rounds — knocks down high spots, fillets corners |
+| **Round edges** | slider | Rounds the four long edges of the body (also an aero factor) |
+
+The carve views (side + top) also show dashed, true-size **wheel silhouettes** at the real axle-mount positions so the shape is read against where the wheels actually sit. The view caption lives above the drawing (never overlapping it).
 
 **Guardrails:** a giant always-visible UNDO button (exact, unlimited); the tools refuse to carve thinner than a minimum body thickness (0.25") so the car can never be destroyed; "Fresh block" reset behind a confirm. **Starter templates** (Wedge, Speeder, Bathtub) give a good-looking base in one tap for kids who want to skip to decorating — each is just a pre-recorded set of carve ops, so it can be re-carved freely.
 
@@ -72,20 +74,20 @@ Two live meters teach the two weight lessons:
 
 ### 3.3 Wheels station
 
-Three big controls, each with a 0–3 level shown as icons:
+Three controls, each a labeled letterpress group with segmented levels:
 
-- 🪵→✨ **Axle polish** (sandpaper grits, in fiction: "shine up the nails")
-- 🌫️ **Graphite puffs** (the classic derby lube — puff animation + satisfying *pff* sound)
-- 🎈 **Raised wheel** toggle — lift one front wheel so only three touch ("three shoes rub less than four!")
+- **Axle polish** (0–3: rough → mirror, in fiction: "shine up the nails")
+- **Graphite** (0–3 puffs — the classic derby lube, with a *pff* sound)
+- **Raised wheel** toggle — lift one front wheel so only three touch ("three shoes rub less than four!")
 
-*(v2 "Expert Garage": axle alignment / rail-riding.)*
+A live **Squeak-O-Meter** turns the resulting friction into a whisper-quiet↔squeaky gauge. *(v2 "Expert Garage": axle alignment / rail-riding.)*
 
 ### 3.4 Paint & decals station
 
-- **Paint**: body color, accent color, wheel color from the vintage palette (§9). More colors unlock via the rivals ladder.
-- **Decals**: flames, lightning bolts, stars, checkers, pinstripes, eyes — drag onto the car in 3D, stamp where touched (max 8).
-- **Racing number**: big two-digit number on the side, kid picks 0–99.
-- **Name**: every car gets a name (type it, or tap the name-generator dice: "The Red Rocket", "Thunder Pickle"…).
+- **Paint**: body and wheel color from the vintage palette (§9). More colors unlock via wins.
+- **Stickers**: hand-drawn vector art (flames, bolts, stars, checkers, stripes, eyes, clover, wings, crown, trophy…) placed in **5 fixed slots** (hood/roof/front side/back side/tail) — tap a slot to cycle stickers. Stickers **drape over the carved surface** (see CarBody `surfacePatch`) so they stay flush on scoops and slopes. Some stickers unlock via wins.
+- **Racing number**: a painted roundel on both flanks, kid picks 0–99; it stays a clean circle regardless of carve.
+- **Name**: every car gets a name (type it, or tap the dice for "The Red Rocket", "Thunder Pickle"…).
 
 ### 3.5 Car wall
 
@@ -101,43 +103,45 @@ A regulation-style **42-foot, 4-lane derby track**: starting gate at the top of 
 
 ### 4.2 The heat
 
-Four cars per heat: **the player's car + the chosen rival + 2 filler cars** generated from the race seed (so heats feel like a real event and the rival isn't always the only competition).
+Four cars per heat: **the player's car + the chosen rival + 2 filler cars** seeded from the race seed. Fillers are **capped below the rival** (`generateCappedFiller` degrades a repainted copy of the rival's car until it's provably slower), so the rival is always the fastest opponent — winning the heat and beating the rival are the same event a kid can watch.
 
-**Camera choreography** (the race is pre-simulated, so the camera always knows the story):
+**Camera choreography & finish package** (the race is pre-simulated, so the camera knows the story):
 
 1. **Gate ceremony** (~1.5 s): hero shot up the ramp, cars trembling against the pin, flag drop, *clack*.
-2. **Follow cam**: floats above/behind the pack at ~45°, biased toward the player's car, banking naturally down the ramp and through the transition.
-3. **Finish approach**: dollies to a trackside side-on view at the line.
-4. **Photo finish**: when the margin is close, time eases into slow motion over the last stretch, freezes at the line with a white flash, and shows a film-strip frame with nose order and the margin in car lengths. Instant replay button.
+2. **Follow cam**: floats above/behind the pack at ~45°, biased toward the player's car, banking down the ramp and through the transition.
+3. **Finish, always in slow-mo**: every heat eases to ~0.25× as the leader nears the line (so the order is readable), then eases back up once the runner-up crosses. Cars **coast on past the line** (~6 ft runout, decelerating naturally) instead of freezing in a pile.
+4. **Medals + lane light**: the instant each nose crosses, a drawn place medal pops above that car and the winner's lane light on the gantry lights up.
+5. **Photo finish** (margin < 60 ms): deeper slow-mo (0.12×), a camera-snap freeze + white flash.
+6. **Auto instant replay**: "Let's see that again!" — the crossing rewinds and replays in slow motion from a tight finish-line angle before results.
 
-Races run at real derby speed (~3 seconds gate to line — genuinely how fast these cars are, and great pacing for a kid). The drama comes from the choreography, not stretched time.
+Sim runs at real derby speed (~3 s gate to line); the drama is the choreography, not stretched time.
 
 ### 4.3 Results
 
-- Finish times to the thousandth (derby tradition), lane order, margin in "car lengths".
-- **Win**: trophy moment, confetti, any unlock presented like a prize ("New paint: Mustard Gold!").
-- **Loss**: warm, zero-shame ("So close! Pit crew has an idea…") + the **top counterfactual tip** (§6.4).
-- Buttons: Rematch (same rival, new seed) · Back to Garage · Next Rival.
+- Headline in gothic caps (not the display face): "You beat <Rival>!" on a heat win, or names whoever took it. Winner named in a small strip.
+- **3D winner's circle**: the actual winning car — full paint, number, draped stickers — rotates on a turntable beside the panel.
+- **"How the winner was built"** spec sheet (weight, balance, prep, shape) so kids study construction — theirs or the rival's.
+- Placings 1st–4th, each with its ribbon medal, finish time to the thousandth, margin in car lengths.
+- **Win**: fanfare, any unlock presented like a prize ("Prize unlocked: Mustard Gold paint"); a "Print this car's real build plans" link.
+- **Loss**: warm, zero-shame ("So close!") + the **top counterfactual tip** (§6.4) + expandable Pit Crew Notes.
+- Buttons: Rematch (same rival, new seed) · Garage · Next rival.
 
 ---
 
-## 5. Rivals ladder & progression
+## 5. Rivals & divisions
 
-Nine authored rivals in three **divisions of similar strength** (Rookie → Challenger → Champion, three racers each; beat any two in a division to enter the next). Race anyone in an unlocked division. Every rival is a real car design run through the real simulation — each one *loses* to exactly the lesson it teaches, every first victory grants a prize (paint or sticker), and the results screen shows **how the winner was built** (weight, balance, prep, shape) so kids study construction. The original six:
+Nine authored rivals in three **divisions of similar strength**; beat any two racers in a division to enter the next. Race anyone in an unlocked division, in any order. Every rival is a real car design run through the real simulation — each *loses* to exactly the lesson it teaches, and every first victory grants a prize (paint or sticker).
 
-| # | Rival | Their car | The lesson |
-|---|---|---|---|
-| 1 | **Brick Bobby** | A raw uncarved block, no weights | Carve it! Weigh it! (onboarding rival — almost anything beats him) |
-| 2 | **Featherweight Flo** | Sleek shape but only 3 oz | **Weight**: heavier (up to the 5 oz limit) is faster |
-| 3 | **Nose-Heavy Ned** | 5 oz, all in the nose | **Weight placement**: heavy in the back wins |
-| 4 | **Squeaky Pete** | Good car, zero polish, zero graphite | **Friction**: smooth and slippery wins |
-| 5 | **Barn-Door Barb** | Heavy and rear-weighted but tall and blunt | **Aerodynamics**: slice through the air |
-| 6 | **Lightning Lena** | Near-optimal everything | The boss: needs every lesson + the raised wheel |
+| Division | Racers | Lessons |
+|---|---|---|
+| **Rookie** | Brick Bobby (raw block), Featherweight Flo (3 oz), Plank Paula (unpolished plank) | carve it · total weight · friction |
+| **Challenger** | Nose-Heavy Ned (nose weight), Squeaky Pete (no prep), Middleweight Mel (dead-center weight) | placement · friction · placement |
+| **Champion** | Barn-Door Barb (tall brick), Tailfin Tina (four wheels down), Lightning Lena (boss) | aero · raised wheel · everything |
 
-- Each rival has a poster-style portrait card, a tagline, and an intro that hints at their flaw ("Ned says the front is the fast part. Is he right?").
-- **Beating a rival** earns a trophy and unlocks cosmetics (paints, decals, wheel colors). Rivals stay available for rematches; silver→gold trophies for winning by a bigger margin.
-- **Losing** always routes through the feedback engine — the ladder is beatable *only* by applying the lessons, which is the curriculum working.
-- Filler cars are seeded mid-tier randoms with generated names ("Gary's Comet", "The Waffle Wagon").
+- Each rival's card shows their **actual car's side-profile**, a tagline, and an intro hinting at the flaw. Cards are grouped under division headers; locked divisions show the entry requirement.
+- **Winning = winning the heat** (1st of 4). Fillers are capped below the rival (§4.2), so the honest lesson always decides it.
+- **Beating a racer** grants a prize and a star (gold star for a ≥2-length win); racers stay open for rematches.
+- **Losing** routes through the feedback engine — the roster is beatable *only* by applying the lessons, which is the curriculum working.
 
 ---
 
@@ -192,31 +196,31 @@ Each lesson has an optional **Pit Crew Notes** panel — a short script written 
 
 ## 7. Blueprint export
 
-When a car is worth building for real, one tap produces a **print-ready shop blueprint** (browser print → paper):
+Reached from a labeled **"Build Plans"** button in the garage top bar and a "Print this car's real build plans" link on a winning results screen. One tap produces a **print-ready shop blueprint** (browser print → paper):
 
-- **1:1-scale side profile and top profile** of the carved body with dimension callouts (overall length/height, axle positions per BSA spec) — tape it to a real block and cut.
-- **Weight plan**: hole positions with ounces per hole and the target balance point marked ("your real car should balance here").
-- **Wheel prep checklist**: polish steps, graphite, which wheel to raise.
-- **Paint scheme**: swatches with palette names, decal thumbnails and placement, the car's name and number in the big display face.
+- **1:1-scale side profile and top profile** of the carved body (solid wood-tint fill, dimension lines with ticks, a baseline, dashed wheel silhouettes at true mount height, axle callouts) — tape it to a real block and cut. **Critical**: each SVG's `width` in mm must equal its viewBox width in units, or the scale is wrong.
+- **Weight plan**: hole positions with ounces per hole (clamped onto the wood so you never drill into air) and the balance point marked.
+- **Build sheet**: framed table of weight, balance, polish, graphite, wheels — Oswald labels, Georgia prose values.
+- **Paint & stickers**: swatches with palette names, drawn sticker thumbnails + placement, name in the display face, number.
 - **Calibration ruler**: a printed bar that must measure exactly 1 inch, with "print at 100%" instructions.
 
-On screen it's styled as a vintage kraft-paper blueprint; in print it swaps to clean toner-friendly linework. Letter landscape, fits a 7" car at true scale.
+On screen it's a balanced vintage kraft-paper sheet (numbered ruled sections); in print (@media print) it stacks to a single column so the true-scale profiles get the full page width, and swaps to clean toner-friendly black linework. Letter landscape.
 
 ---
 
 ## 8. Screens map
 
 ```
-TITLE ──▶ GARAGE ◀──────────────┐
-            │  (5 stations + car wall)
-            ├─▶ RIVAL SELECT (ladder poster wall)
-            │        └─▶ RACE ──▶ RESULTS ──▶ (rematch / garage / next rival)
-            ├─▶ BLUEPRINT (print view)
-            └─▶ SETTINGS (mute, narration, reset — behind a parent gate: "hold 3 seconds")
-DEV: /tuning panel (dev-only route — sliders over all physics constants, live finish-time table)
+TITLE ──▶ GARAGE ◀──────────────────┐   (title also has mute + narration toggles)
+   │        │  (carve/weights/wheels/paint/car-wall tabs)
+   │        ├─▶ RIVAL SELECT (divisions wall)
+   │        │        └─▶ RACE ──▶ RESULTS ──▶ (rematch / garage / next rival / print plans)
+   │        └─▶ BLUEPRINT (print view) ◀── also from a winning RESULTS
+   └─▶ RIVAL SELECT (once a division is unlocked)
+DEV: ?tuning (sliders over all physics constants + live finish-time table)
 ```
 
-No URL router — a screen state machine (also avoids GitHub Pages SPA-refresh 404s).
+No URL router — a screen state machine in `appStore` (also avoids GitHub Pages SPA-refresh 404s). One persistent `<Canvas>` renders the per-screen 3D (title showcase, garage preview, race, winner's circle).
 
 ---
 
@@ -273,7 +277,7 @@ Low-poly flat-shaded ("toy world"). The car mesh is deliberately faceted — lik
 
 ## 11. Technical summary
 
-- **Stack**: Vite + React + TypeScript + react-three-fiber + drei; zustand (state), zod (save validation), maath (camera damping), howler (audio). No physics engine, no CSG library, no router.
+- **Stack**: Vite + React + TypeScript + react-three-fiber + drei; zustand (state), zod (save validation), maath (camera damping), Web Audio synth (SFX) + Web Speech (narration). Fonts: Anton/Oswald/Yellowtail. No physics engine, no CSG library, no router, no emoji.
 - **Carving** = two 2D heightfield profiles (`yTop(x)`, `halfWidth(x)`) edited by a replayable operation log; the 3D mesh is a decimated loft of rounded-rect cross-sections. Undo is exact; saves are ~2 KB; the blueprint is the profiles.
 - **Racing** = simulate-then-playback: the deterministic sim computes the entire heat before the gate drops; the 3D scene replays position arrays. Seeded RNG → any race replays exactly.
 - **Saves**: localStorage, zod-validated, versioned migrations, corruption quarantined (never crash a kid's game).
@@ -286,7 +290,7 @@ Full conventions and architecture rules: see `CLAUDE.md`.
 
 ## 12. v1 scope
 
-**In v1:** carve/sand/scoop/round + templates · weights + scale + balance bubble · wheel prep + raised wheel · paint/decals/number/name · car wall (multi-save) · 4-lane 3D race with follow-cam + photo finish · 6-rival ladder + filler cars · trophies + cosmetic unlocks · counterfactual feedback · Pit Crew Notes · SFX/music/mute · optional narration · blueprint print export · local best times.
+**Shipped:** carve/sand/scoop/round + templates · weights + scale + balance bubble · wheel prep + raised wheel · paint/draped stickers/number/name · car wall (multi-save) · 4-lane 3D race with follow-cam + universal slow-mo finish + medals + lane light + auto instant replay + photo finish · 9 rivals in 3 divisions + capped filler cars · stars + cosmetic unlocks (prize every win) · winner's circle + spec sheet · counterfactual feedback · Pit Crew Notes · Web Audio SFX/mute · optional narration · 1:1 blueprint print export · local best times.
 
 **Roadmap (post-v1):**
 
