@@ -5,6 +5,8 @@ import { LESSONS } from '../content/lessons'
 import { rivalById, RIVALS } from '../content/rivals'
 import { unlockById } from '../content/unlocks'
 import { medalDataURL } from '../garage/carDecals'
+import { AXLE_X_IN } from '../model/carDesign'
+import { deriveSimParams } from '../model/deriveSimParams'
 import { useAppStore } from '../state/appStore'
 import { useProgressStore } from '../state/progressStore'
 import { PLAYER_LANE, RIVAL_LANE, useRaceStore } from '../state/raceStore'
@@ -13,6 +15,17 @@ import { CAR_LENGTH_M } from '../sim/tuning'
 import { Btn } from '../ui/Btn'
 import { IconFlag, IconRematch, IconWrench, LessonIcon } from '../ui/icons'
 import { DiamondRule } from '../ui/ornaments'
+
+function SpecRow({ label, value }: { label: string; value: string }) {
+  return (
+    <>
+      <span className="lp-label" style={{ fontSize: '0.64rem', alignSelf: 'center', color: 'var(--navy)' }}>
+        {label}
+      </span>
+      <span style={{ fontFamily: 'var(--font-prose)', fontStyle: 'italic' }}>{value}</span>
+    </>
+  )
+}
 
 export function ResultsScreen() {
   const setScreen = useAppStore((s) => s.setScreen)
@@ -40,7 +53,11 @@ export function ResultsScreen() {
 
     if (wonHeat) {
       const newUnlocks = recordWin(rivalId, marginLengths)
-      const nextRival = RIVALS[RIVALS.findIndex((r) => r.id === rivalId) + 1]
+      // next challenge = first undefeated racer in any now-unlocked division
+      const progress = useProgressStore.getState()
+      const nextRival = RIVALS.find(
+        (r) => !progress.defeated.includes(r.id) && progress.isRivalAvailable(r.id),
+      )
       return { wonHeat, heatWinner, rival, marginLengths, newUnlocks, nextRival, tip: undefined }
     }
 
@@ -134,25 +151,79 @@ export function ResultsScreen() {
         {(() => {
           const winnerLane = raceData.order[0]!
           const winner = lanes[winnerLane]!
+          const spec = deriveSimParams(winner.design)
+          const { polish, graphite, raised } = winner.design.wheels
+          const behindRearAxle = AXLE_X_IN.rear - spec.comXIn
+          const inZone = behindRearAxle >= 0.25 && behindRearAxle <= 1.5
+          const shape =
+            spec.params.dragCd <= 0.58
+              ? 'slippery as a fish'
+              : spec.params.dragCd <= 0.72
+                ? 'sleek and low'
+                : spec.params.dragCd <= 0.9
+                  ? 'a bit boxy'
+                  : 'a flying brick'
+          const POLISH_WORDS = ['rough', 'sanded', 'smooth', 'mirror']
           return (
-            <div
-              style={{
-                border: '2px solid var(--ink)',
-                borderRadius: 2,
-                background: 'var(--kraft)',
-                padding: '7px 12px',
-                marginBottom: 12,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 10,
-              }}
-            >
-              <img src={medalDataURL(0)} width={38} height={38} alt="first place" style={{ flexShrink: 0 }} />
-              <div className="lp-label" style={{ fontSize: '0.7rem', lineHeight: 1.5 }}>
-                In the winner&rsquo;s circle: {winner.design.name} No.{winner.design.number}
-                {winner.isPlayer ? ' — that’s you!' : winner.isRival ? ` — ${outcome.rival.name}` : ''}
+            <>
+              <div
+                style={{
+                  border: '2px solid var(--ink)',
+                  borderRadius: 2,
+                  background: 'var(--kraft)',
+                  padding: '7px 12px',
+                  marginBottom: 10,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 10,
+                }}
+              >
+                <img src={medalDataURL(0)} width={38} height={38} alt="first place" style={{ flexShrink: 0 }} />
+                <div className="lp-label" style={{ fontSize: '0.7rem', lineHeight: 1.5 }}>
+                  In the winner&rsquo;s circle: {winner.design.name} No.{winner.design.number}
+                  {winner.isPlayer ? ' — that’s you!' : winner.isRival ? ` — ${outcome.rival.name}` : ''}
+                </div>
               </div>
-            </div>
+
+              {/* how the winning car was built — the peek under the hood */}
+              <fieldset
+                style={{
+                  border: '1.5px solid var(--ink)',
+                  borderRadius: 2,
+                  padding: '6px 12px 9px',
+                  margin: '0 0 12px',
+                }}
+              >
+                <legend className="lp-label" style={{ fontSize: '0.62rem', padding: '0 8px' }}>
+                  How the winner was built
+                </legend>
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'auto 1fr',
+                    columnGap: 14,
+                    rowGap: 3,
+                    fontSize: '0.86rem',
+                  }}
+                >
+                  <SpecRow label="Weight" value={`${spec.totalOz.toFixed(1)} oz of 5${spec.totalOz >= 4.75 ? ' — loaded up!' : ''}`} />
+                  <SpecRow
+                    label="Balance"
+                    value={
+                      behindRearAxle >= 0
+                        ? `${behindRearAxle.toFixed(1)}″ ahead of the rear axle${inZone ? ' — heavy in the back!' : ''}`
+                        : 'behind the rear axle!'
+                    }
+                  />
+                  <SpecRow
+                    label="Axles"
+                    value={`${POLISH_WORDS[polish]} polish · ${graphite === 0 ? 'no' : graphite} puff${graphite === 1 ? '' : 's'} of graphite`}
+                  />
+                  <SpecRow label="Wheels" value={raised === 'none' ? 'all four down' : 'front wheel raised — only three rub'} />
+                  <SpecRow label="Shape" value={shape} />
+                </div>
+              </fieldset>
+            </>
           )
         })()}
 

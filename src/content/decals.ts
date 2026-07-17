@@ -20,6 +20,9 @@ export const DECALS: Decal[] = [
   { id: 'boom', name: 'Ka-boom' },
   { id: 'clover', name: 'Lucky Clover' },
   { id: 'arrow', name: 'Speed Arrows' },
+  { id: 'wings', name: 'Racing Wings' },
+  { id: 'crown', name: 'Crown' },
+  { id: 'trophy', name: 'Trophy' },
 ]
 
 export const decalById = (id: string) => DECALS.find((d) => d.id === id)

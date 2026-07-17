@@ -14,9 +14,10 @@ import type { PaletteId } from './palette'
 import { TEMPLATES } from './templates'
 
 /**
- * The rivals ladder. Every rival is a REAL CarDesign run through the real
- * sim — each one loses to exactly the lesson it teaches (design.md §5).
- * Beat the current rival to unlock the next.
+ * The rivals roster, organized into DIVISIONS of similar-strength cars.
+ * Every rival is a REAL CarDesign run through the real sim — each one
+ * loses to exactly the lesson it teaches (design.md §5). Race anyone in
+ * your division; beat enough of them to move up.
  */
 export interface Rival {
   id: string
@@ -24,10 +25,26 @@ export interface Rival {
   tagline: string
   intro: string
   lesson: LessonId
+  /** division tier: 1 = Rookie, 2 = Challenger, 3 = Champion */
+  tier: 1 | 2 | 3
   design: CarDesign
   /** unlock ids granted on first win (see content/unlocks.ts) */
   unlocks: string[]
 }
+
+export interface Division {
+  tier: 1 | 2 | 3
+  name: string
+  motto: string
+  /** wins in the previous division needed to enter */
+  winsToEnter: number
+}
+
+export const DIVISIONS: Division[] = [
+  { tier: 1, name: 'Rookie Division', motto: 'everyone starts here', winsToEnter: 0 },
+  { tier: 2, name: 'Challenger Division', motto: 'the pits get serious', winsToEnter: 2 },
+  { tier: 3, name: 'Champion Division', motto: 'bring everything you know', winsToEnter: 2 },
+]
 
 const wedgeOps = TEMPLATES.find((t) => t.id === 'wedge')!.ops
 const speederOps = TEMPLATES.find((t) => t.id === 'speeder')!.ops
@@ -66,6 +83,7 @@ export const RIVALS: Rival[] = [
     tagline: '“Carving is for quitters.”',
     intro: 'Bobby says his block is already perfect. Is a block a race car?',
     lesson: 'carve',
+    tier: 1,
     design: rivalDesign('bobby', 'The Brick', 8, 'skyBlue', bobbyOps, [], {
       raised: 'none',
       polish: 0,
@@ -79,6 +97,7 @@ export const RIVALS: Rival[] = [
     tagline: '“Light as a feather, fast as a… feather?”',
     intro: 'Flo carved a beautiful car but skipped the weights. Heavy or light — which pushes harder down a hill?',
     lesson: 'weight',
+    tier: 1,
     design: rivalDesign('flo', 'The Feather', 3, 'paper', [...wedgeOps], [], {
       raised: 'none',
       polish: 3,
@@ -87,11 +106,35 @@ export const RIVALS: Rival[] = [
     unlocks: ['paint-orange', 'decal-rocket'],
   },
   {
+    id: 'paula',
+    name: 'Plank Paula',
+    tagline: '“Sandpaper? Never met her.”',
+    intro: 'Paula sawed her block into a plank and called it done — those axles have never seen polish. Hear the squeak?',
+    lesson: 'friction',
+    tier: 1,
+    design: rivalDesign(
+      'paula',
+      'The Plank',
+      22,
+      'orange',
+      [
+        { t: 'slice', view: 'side', ax: 0, ay: 0.5, bx: 7, by: 0.5 },
+      ],
+      [
+        { slot: 6, kind: 'steel' },
+        { slot: 5, kind: 'steel' },
+      ],
+      { raised: 'none', polish: 0, graphite: 0 },
+    ),
+    unlocks: ['decal-eyes'],
+  },
+  {
     id: 'ned',
     name: 'Nose-Heavy Ned',
     tagline: '“The front is the fast part!”',
     intro: 'Ned crammed every weight into the nose. Does the front of the hill or the back of the hill push longer?',
     lesson: 'placement',
+    tier: 2,
     design: rivalDesign(
       'ned',
       'The Sledgehammer',
@@ -104,7 +147,7 @@ export const RIVALS: Rival[] = [
       ],
       { raised: 'none', polish: 3, graphite: 3 },
     ),
-    unlocks: ['paint-forest', 'decal-eyes'],
+    unlocks: ['paint-forest', 'decal-boom'],
   },
   {
     id: 'pete',
@@ -112,6 +155,7 @@ export const RIVALS: Rival[] = [
     tagline: '“You can hear me coming!”',
     intro: 'Pete never polishes anything. Listen to those axles squeak — where is his speed going?',
     lesson: 'friction',
+    tier: 2,
     design: rivalDesign(
       'pete',
       'The Screamer',
@@ -124,7 +168,28 @@ export const RIVALS: Rival[] = [
       ],
       { raised: 'none', polish: 0, graphite: 0 },
     ),
-    unlocks: ['paint-paper', 'decal-boom'],
+    unlocks: ['paint-paper', 'decal-clover'],
+  },
+  {
+    id: 'mel',
+    name: 'Middleweight Mel',
+    tagline: '“Right in the middle — perfectly balanced!”',
+    intro: 'Mel put every weight dead center. Balanced sounds smart… but which end of the car should ride the hill longest?',
+    lesson: 'placement',
+    tier: 2,
+    design: rivalDesign(
+      'mel',
+      'The Seesaw',
+      50,
+      'skyBlue',
+      [...wedgeOps],
+      [
+        { slot: 2, kind: 'tungsten' },
+        { slot: 3, kind: 'tungsten' },
+      ],
+      { raised: 'none', polish: 2, graphite: 1 },
+    ),
+    unlocks: ['decal-wings'],
   },
   {
     id: 'barb',
@@ -132,6 +197,7 @@ export const RIVALS: Rival[] = [
     tagline: '“The air can move for ME.”',
     intro: 'Barb did everything right — except her car is a tall brick. Who has to shove more air out of the way?',
     lesson: 'aero',
+    tier: 3,
     design: rivalDesign(
       'barb',
       'The Barn Door',
@@ -145,7 +211,29 @@ export const RIVALS: Rival[] = [
       ],
       { raised: 'none', polish: 3, graphite: 3 },
     ),
-    unlocks: ['paint-ink', 'decal-clover'],
+    unlocks: ['paint-ink', 'decal-skull'],
+  },
+  {
+    id: 'tina',
+    name: 'Tailfin Tina',
+    tagline: '“All four on the floor.”',
+    intro: 'Tina’s car is nearly perfect — sleek, heavy in the back, polished. But all four wheels rub the track. Can you find the last trick?',
+    lesson: 'wheels',
+    tier: 3,
+    design: rivalDesign(
+      'tina',
+      'The Tailfin',
+      21,
+      'navy',
+      [...speederOps],
+      [
+        { slot: 6, kind: 'tungsten' },
+        { slot: 5, kind: 'tungsten' },
+        { slot: 8, kind: 'steel' },
+      ],
+      { raised: 'none', polish: 3, graphite: 2 },
+    ),
+    unlocks: ['decal-crown'],
   },
   {
     id: 'lena',
@@ -153,6 +241,7 @@ export const RIVALS: Rival[] = [
     tagline: '“Catch me if you can.”',
     intro: 'The champ. Sleek, heavy in the back, polished, graphited — and she rides on three wheels. Bring everything you know.',
     lesson: 'wheels',
+    tier: 3,
     design: rivalDesign(
       'lena',
       'Lightning',
@@ -166,7 +255,7 @@ export const RIVALS: Rival[] = [
       ],
       { raised: 'frontLeft', polish: 3, graphite: 2 },
     ),
-    unlocks: ['decal-skull'],
+    unlocks: ['decal-trophy'],
   },
 ]
 

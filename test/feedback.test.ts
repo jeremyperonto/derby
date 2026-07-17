@@ -47,6 +47,19 @@ describe('rivals ladder', () => {
     }
   })
 
+  it('divisions are ordered: every Rookie racer is slower than every Champion racer', () => {
+    const noWobble = { ...TUNING, wobble: 0 }
+    const solo = (design: Parameters<typeof deriveSimParams>[0]) =>
+      runRace([deriveSimParams(design, noWobble).params], 1, noWobble).lanes[0]!.finishTime
+    const tier1 = RIVALS.filter((r) => r.tier === 1).map((r) => ({ name: r.name, t: solo(r.design) }))
+    const tier3 = RIVALS.filter((r) => r.tier === 3).map((r) => ({ name: r.name, t: solo(r.design) }))
+    for (const rookie of tier1) {
+      for (const champ of tier3) {
+        expect(rookie.t, `${champ.name} should out-race ${rookie.name}`).toBeGreaterThan(champ.t)
+      }
+    }
+  })
+
   it('the ladder is roughly ascending: Bobby slowest, Lena fastest', () => {
     const noWobble = { ...TUNING, wobble: 0 }
     const times = RIVALS.map(

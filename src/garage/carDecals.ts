@@ -211,6 +211,83 @@ const STICKER_DRAWS: Record<string, Draw> = {
       outline(ctx, s)
     }
   },
+  wings: (ctx, s) => {
+    // two feather fans spreading from a center dot
+    for (const dir of [1, -1]) {
+      for (let f = 0; f < 3; f++) {
+        const spread = 0.16 + f * 0.14
+        ctx.beginPath()
+        ctx.moveTo(s * 0.5, s * 0.55)
+        ctx.quadraticCurveTo(
+          s * (0.5 + dir * spread),
+          s * (0.36 - f * 0.06),
+          s * (0.5 + dir * (spread + 0.16)),
+          s * (0.42 - f * 0.05),
+        )
+        ctx.quadraticCurveTo(s * (0.5 + dir * spread), s * (0.52 - f * 0.03), s * 0.5, s * 0.62)
+        ctx.closePath()
+        ctx.fillStyle = f % 2 ? PALETTE.paper : PALETTE.skyBlue
+        ctx.fill()
+        outline(ctx, s)
+      }
+    }
+    ctx.beginPath()
+    ctx.arc(s * 0.5, s * 0.58, s * 0.07, 0, Math.PI * 2)
+    ctx.fillStyle = PALETTE.brickRed
+    ctx.fill()
+    outline(ctx, s)
+  },
+  crown: (ctx, s) => {
+    ctx.beginPath()
+    ctx.moveTo(s * 0.18, s * 0.72)
+    ctx.lineTo(s * 0.14, s * 0.32)
+    ctx.lineTo(s * 0.32, s * 0.5)
+    ctx.lineTo(s * 0.5, s * 0.22)
+    ctx.lineTo(s * 0.68, s * 0.5)
+    ctx.lineTo(s * 0.86, s * 0.32)
+    ctx.lineTo(s * 0.82, s * 0.72)
+    ctx.closePath()
+    ctx.fillStyle = PALETTE.mustard
+    ctx.fill()
+    outline(ctx, s)
+    for (const cx of [0.32, 0.5, 0.68]) {
+      ctx.beginPath()
+      ctx.arc(s * cx, s * 0.62, s * 0.045, 0, Math.PI * 2)
+      ctx.fillStyle = PALETTE.brickRed
+      ctx.fill()
+    }
+  },
+  trophy: (ctx, s) => {
+    ctx.fillStyle = PALETTE.mustard
+    // cup
+    ctx.beginPath()
+    ctx.moveTo(s * 0.32, s * 0.18)
+    ctx.lineTo(s * 0.68, s * 0.18)
+    ctx.quadraticCurveTo(s * 0.66, s * 0.52, s * 0.5, s * 0.58)
+    ctx.quadraticCurveTo(s * 0.34, s * 0.52, s * 0.32, s * 0.18)
+    ctx.closePath()
+    ctx.fill()
+    outline(ctx, s)
+    // handles
+    for (const dir of [1, -1]) {
+      ctx.beginPath()
+      ctx.arc(s * (0.5 + dir * 0.26), s * 0.28, s * 0.09, 0, Math.PI * 2)
+      ctx.strokeStyle = PALETTE.ink
+      ctx.lineWidth = s * 0.05
+      ctx.stroke()
+    }
+    // stem + base
+    ctx.fillRect(s * 0.45, s * 0.58, s * 0.1, s * 0.12)
+    ctx.fillStyle = PALETTE.mustard
+    ctx.beginPath()
+    ctx.moveTo(s * 0.32, s * 0.82)
+    ctx.lineTo(s * 0.68, s * 0.82)
+    ctx.lineTo(s * 0.62, s * 0.7)
+    ctx.lineTo(s * 0.38, s * 0.7)
+    ctx.closePath()
+    ctx.fill()
+    outline(ctx, s)
+  },
 }
 
 export function decalTexture(decalId: string): CanvasTexture | null {

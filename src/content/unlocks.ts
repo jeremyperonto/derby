@@ -23,6 +23,9 @@ export const UNLOCKS: Unlock[] = [
   { id: 'decal-boom', kind: 'decal', itemId: 'boom', label: 'Ka-boom sticker' },
   { id: 'decal-clover', kind: 'decal', itemId: 'clover', label: 'Lucky clover sticker' },
   { id: 'decal-skull', kind: 'decal', itemId: 'arrow', label: 'Speed arrows sticker' },
+  { id: 'decal-wings', kind: 'decal', itemId: 'wings', label: 'Racing wings sticker' },
+  { id: 'decal-crown', kind: 'decal', itemId: 'crown', label: 'Crown sticker' },
+  { id: 'decal-trophy', kind: 'decal', itemId: 'trophy', label: 'Champion’s trophy sticker' },
 ]
 
 /** paints/decals available before any wins */
