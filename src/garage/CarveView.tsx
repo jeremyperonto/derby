@@ -143,8 +143,7 @@ export function CarveView() {
       onPointerUp={onUp}
       onPointerCancel={onUp}
     >
-      {/* workbench background + inch grid */}
-      <rect x={-PAD} y={-PAD} width={BLOCK.lengthIn + 2 * PAD} height={H + 2 * PAD} fill="var(--kraft)" rx={0.15} />
+      {/* inch grid (no workbench backdrop — block sits on the paper) */}
       {Array.from({ length: 8 }, (_, i) => (
         <line key={i} x1={i} y1={0} x2={i} y2={H} stroke="var(--ink)" strokeOpacity={0.15} strokeWidth={0.015} />
       ))}

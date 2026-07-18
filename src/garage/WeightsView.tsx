@@ -74,14 +74,7 @@ export function WeightsView() {
         viewBox={`-0.4 -0.4 ${BLOCK.lengthIn + 0.8} ${BLOCK.widthIn + 0.8}`}
         style={{ width: '100%', flex: 1, minHeight: 0 }}
       >
-        <rect
-          x={-0.4}
-          y={-0.4}
-          width={BLOCK.lengthIn + 0.8}
-          height={BLOCK.widthIn + 0.8}
-          fill="var(--kraft)"
-          rx={0.06}
-        />
+        {/* no workbench backdrop — the car sits on the paper */}
         {/* body outline from the live top profile (underside silhouette) */}
         <path d={undersidePath(buffers.halfWidth, mid)} fill="var(--pine)" stroke="var(--ink)" strokeWidth={0.035} />
         {/* axles */}
@@ -197,10 +190,11 @@ export function WeightsView() {
               fontSize: '0.85rem',
               color: bounce ? 'var(--brick-red)' : 'var(--ink)',
               animation: bounce ? 'shake 0.5s' : undefined,
-              whiteSpace: 'nowrap',
+              flex: 1,
+              minWidth: 0,
             }}
           >
-            {bounce ? 'Too heavy for the official scale!' : `${derived.totalOz.toFixed(2)} of ${MAX_WEIGHT_OZ} oz`}
+            {bounce ? 'Too heavy — 5 oz max!' : `${derived.totalOz.toFixed(2)} of ${MAX_WEIGHT_OZ} oz`}
           </div>
         </Fieldset>
 

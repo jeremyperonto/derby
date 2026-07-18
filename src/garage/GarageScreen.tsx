@@ -171,6 +171,12 @@ export function GarageScreen() {
               paddingLeft: 10,
               flexWrap: 'nowrap',
               overflowX: compact ? 'auto' : 'visible',
+              // pin the vertical axis: overflow-x:auto silently promotes
+              // overflow-y to auto too, letting the strip drift up/down on
+              // touch. Lock it flat and pan horizontally only.
+              overflowY: compact ? 'hidden' : 'visible',
+              touchAction: compact ? 'pan-x' : undefined,
+              overscrollBehaviorX: compact ? 'contain' : undefined,
               flexShrink: 0,
             }}
           >
@@ -201,7 +207,9 @@ export function GarageScreen() {
                     gap: compact ? 5 : 7,
                     flexShrink: 0,
                     position: 'relative',
-                    top: active ? 0 : 3,
+                    // desktop keeps the recessed folder-tab lift; on compact
+                    // every tab sits on one fixed baseline (no vertical drift)
+                    top: compact ? 0 : active ? 0 : 3,
                     zIndex: active ? 2 : 1,
                     transition: 'top 100ms',
                   }}
