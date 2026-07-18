@@ -9,10 +9,30 @@
  *   ?snap=name[&snapdelay=ms] capture the canvas after a delay and POST it
  *                             to http://localhost:5198/?name=<name>
  *   ?snap=a@1000,b@4000       multiple timed captures
+ *   ?device=390x844           shrink #root to a phone box (the automated
+ *                             browser pins innerWidth at 1920, so this is the
+ *                             only way to render the real phone layout)
  */
 export function installDevHooks(): void {
   if (!import.meta.env.DEV) return
   const params = new URLSearchParams(location.search)
+
+  // ?device=WxH — constrain #root so responsive layouts render at a true
+  // phone size. useViewport measures #root, so it follows automatically.
+  const device = params.get('device')
+  if (device) {
+    const m = /^(\d+)x(\d+)$/.exec(device)
+    if (m) {
+      const root = document.getElementById('root')
+      if (root) {
+        root.style.width = `${m[1]}px`
+        root.style.height = `${m[2]}px`
+        root.style.overflow = 'hidden'
+        root.style.outline = '2px dashed #999'
+        document.body.style.background = '#444'
+      }
+    }
+  }
 
   const screen = params.get('screen')
   const carve = params.get('carve')

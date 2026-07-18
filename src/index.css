@@ -28,6 +28,16 @@
   font-weight: 600;
 }
 
+/* horizontally-scrollable strip (mobile tab bars) with no visible scrollbar */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 @keyframes photoflash {
   0% {
     opacity: 0.95;

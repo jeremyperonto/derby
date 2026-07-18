@@ -1,5 +1,5 @@
 import { useRef } from 'react'
-import { useFrame } from '@react-three/fiber'
+import { useFrame, useThree } from '@react-three/fiber'
 import type { Group } from 'three'
 import { useGarageStore } from '../state/garageStore'
 import { CarBody, WHEEL_DROP_IN } from './CarBody'
@@ -7,20 +7,23 @@ import { PALETTE } from '../content/palette'
 
 /**
  * 3D garage preview inside the persistent Canvas: the live car on a slowly
- * turning display stand, positioned right-of-center so the carve panel
- * (left overlay) doesn't cover it.
+ * turning display stand. On wide screens it sits right-of-center so the carve
+ * panel (left overlay) doesn't cover it; on portrait phones the controls live
+ * in a bottom sheet, so the car is centered and raised into the top band
+ * (and shrunk to fit the narrow horizontal field of view).
  */
 export function GarageScene() {
   const design = useGarageStore((s) => s.design)
   const buffers = useGarageStore((s) => s.buffers)
   const turntable = useRef<Group>(null)
+  const portrait = useThree((s) => s.size.height > s.size.width)
 
   useFrame((_, delta) => {
     if (turntable.current) turntable.current.rotation.y += delta * 0.35
   })
 
   return (
-    <group position={[2.6, -0.4, 0]}>
+    <group position={portrait ? [0, 4.4, 0] : [2.6, -0.4, 0]} scale={portrait ? 0.78 : 1}>
       <group ref={turntable}>
         {/* car centered on the turntable, wheels resting on it */}
         <group position={[-3.5, WHEEL_DROP_IN, 0]}>

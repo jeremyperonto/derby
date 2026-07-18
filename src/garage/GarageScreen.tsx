@@ -1,5 +1,6 @@
-import type { ReactNode } from 'react'
+import { useEffect, useRef, type ReactNode } from 'react'
 import { sfx } from '../audio/audio'
+import { useViewport } from '../app/useViewport'
 import { TEMPLATES } from '../content/templates'
 import { useAppStore } from '../state/appStore'
 import { useGarageStore, type CarveTool, type GarageStation } from '../state/garageStore'
@@ -50,6 +51,14 @@ export function GarageScreen() {
   const canUndo = useGarageStore((s) => s.design.carve.ops.length > 0)
   const canRedo = useGarageStore((s) => s.redoStack.length > 0)
   const { setStation, undo, redo } = useGarageStore.getState()
+  const { compact, stacked } = useViewport()
+
+  // keep the active folder-tab in view when the strip scrolls horizontally
+  const stripRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const el = stripRef.current?.querySelector('[data-active="true"]') as HTMLElement | null
+    el?.scrollIntoView({ inline: 'nearest', block: 'nearest' })
+  }, [station])
 
   return (
     <div
@@ -61,55 +70,116 @@ export function GarageScreen() {
         pointerEvents: 'none',
       }}
     >
-      {/* top bar */}
+      {/* top bar — collapses to icon-first controls on small screens */}
       <div
         style={{
           display: 'flex',
-          alignItems: 'stretch',
-          gap: 10,
-          padding: '10px 14px 6px',
+          alignItems: 'center',
+          gap: compact ? 6 : 10,
+          padding: compact ? '7px 9px 4px' : '10px 14px 6px',
           pointerEvents: 'auto',
           flexWrap: 'wrap',
         }}
       >
-        <Btn size="md" onClick={() => setScreen('title')} title="back to title">
+        <Btn size={compact ? 'sm' : 'md'} onClick={() => setScreen('title')} title="back to title">
           <IconArrowLeft size={18} />
         </Btn>
-        <Plaque tone="ink" style={{ fontFamily: 'var(--font-display)', letterSpacing: '0.04em', fontSize: '1rem', textTransform: 'none' }}>
-          {design.name} &middot; No.{design.number}
+        <Plaque
+          tone="ink"
+          style={{
+            fontFamily: 'var(--font-display)',
+            letterSpacing: '0.04em',
+            fontSize: compact ? '0.82rem' : '1rem',
+            textTransform: 'none',
+            minWidth: 0,
+            flex: compact ? '1 1 90px' : '0 0 auto',
+            maxWidth: compact ? '48vw' : undefined,
+            minHeight: compact ? 38 : undefined,
+            padding: compact ? '6px 10px' : undefined,
+            overflow: 'hidden',
+          }}
+        >
+          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>
+            {design.name} &middot; No.{design.number}
+          </span>
         </Plaque>
-        <Plaque tone={derived.overweight ? 'red' : 'paper'}>
+        <Plaque
+          tone={derived.overweight ? 'red' : 'paper'}
+          style={compact ? { fontSize: '0.74rem', minHeight: 38, padding: '6px 9px' } : undefined}
+        >
           <IconScale size={16} /> {derived.totalOz.toFixed(1)} / 5 oz
         </Plaque>
-        <div style={{ flex: 1 }} />
+        {!compact && <div style={{ flex: 1 }} />}
         {station === 'carve' && (
           <>
-            <Btn onClick={undo} disabled={!canUndo} title="undo">
-              <IconUndo size={18} /> Undo
+            <Btn size={compact ? 'sm' : 'md'} onClick={undo} disabled={!canUndo} title="undo">
+              <IconUndo size={18} /> {!compact && 'Undo'}
             </Btn>
-            <Btn onClick={redo} disabled={!canRedo} title="redo">
+            <Btn size={compact ? 'sm' : 'md'} onClick={redo} disabled={!canRedo} title="redo">
               <IconRedo size={18} />
             </Btn>
           </>
         )}
-        <Btn onClick={() => setScreen('blueprint')} title="print real-world plans for this car">
-          <IconRuler size={18} /> Build Plans
+        <Btn size={compact ? 'sm' : 'md'} onClick={() => setScreen('blueprint')} title="print real-world plans for this car">
+          <IconRuler size={18} /> {!compact && 'Build Plans'}
         </Btn>
-        <Btn variant="red" size="lg" onClick={() => setScreen('rivalSelect')}>
-          <IconFlag size={20} /> Race
+        {compact && <div style={{ flex: 1 }} />}
+        <Btn variant="red" size={compact ? 'md' : 'lg'} onClick={() => setScreen('rivalSelect')}>
+          <IconFlag size={compact ? 18 : 20} /> Race
         </Btn>
       </div>
 
-      {/* main row: workbench panel left, 3D preview shows through right */}
-      <div style={{ flex: 1, display: 'flex', minHeight: 0 }}>
-        <div style={{ width: 'min(58%, 720px)', margin: '0 0 10px 14px', display: 'flex', flexDirection: 'column', pointerEvents: 'auto' }}>
-          {/* folder-tab strip */}
-          <div style={{ display: 'flex', gap: 4, paddingLeft: 10 }}>
+      {/* main area: side-by-side on wide screens (panel left, car right);
+          stacked bottom-sheet on portrait phones (car above, controls below) */}
+      <div
+        style={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: stacked ? 'column' : 'row',
+          minHeight: 0,
+        }}
+      >
+        {/* transparent car band — only in stacked mode, lets the 3D car show */}
+        {stacked && <div style={{ flex: 1, minHeight: 0, pointerEvents: 'none' }} />}
+
+        <div
+          style={
+            stacked
+              ? {
+                  height: 'min(58vh, 580px)',
+                  margin: '0 8px 8px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  pointerEvents: 'auto',
+                }
+              : {
+                  width: 'min(58%, 720px)',
+                  margin: '0 0 10px 14px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  pointerEvents: 'auto',
+                }
+          }
+        >
+          {/* folder-tab strip — scrolls horizontally when it can't fit */}
+          <div
+            ref={stripRef}
+            className={compact ? 'no-scrollbar' : undefined}
+            style={{
+              display: 'flex',
+              gap: 4,
+              paddingLeft: 10,
+              flexWrap: 'nowrap',
+              overflowX: compact ? 'auto' : 'visible',
+              flexShrink: 0,
+            }}
+          >
             {STATIONS.map((s) => {
               const active = station === s.id
               return (
                 <button
                   key={s.id}
+                  data-active={active}
                   className="lp-label"
                   onClick={() => {
                     sfx.tap()
@@ -121,13 +191,15 @@ export function GarageScreen() {
                     border: '2px solid var(--ink)',
                     borderBottom: 'none',
                     borderRadius: '3px 3px 0 0',
-                    padding: '9px 14px 11px',
+                    padding: compact ? '8px 11px 10px' : '9px 14px 11px',
                     marginBottom: -2,
-                    fontSize: '0.74rem',
-                    letterSpacing: '0.12em',
+                    fontSize: compact ? '0.66rem' : '0.74rem',
+                    letterSpacing: compact ? '0.08em' : '0.12em',
+                    whiteSpace: 'nowrap',
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: 7,
+                    gap: compact ? 5 : 7,
+                    flexShrink: 0,
                     position: 'relative',
                     top: active ? 0 : 3,
                     zIndex: active ? 2 : 1,
@@ -152,10 +224,11 @@ export function GarageScreen() {
               border: '2px solid var(--ink)',
               boxShadow: 'inset 0 0 0 4px var(--paper), inset 0 0 0 5px var(--ink)',
               borderRadius: 2,
-              padding: 14,
-              gap: 10,
+              padding: compact ? 10 : 14,
+              gap: compact ? 8 : 10,
               position: 'relative',
               zIndex: 1,
+              overflowY: stacked ? 'auto' : undefined,
             }}
           >
             {station === 'carve' && <CarveStation />}

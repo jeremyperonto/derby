@@ -106,8 +106,9 @@ export function BlueprintScreen() {
         </div>
 
         <div className="bp-body" style={{ display: 'flex', gap: 26, flexWrap: 'wrap' }}>
-          {/* profiles column */}
-          <div style={{ flex: '1 1 600px', minWidth: 320, display: 'flex', flexDirection: 'column', gap: 6 }}>
+          {/* profiles column (minWidth kept below a phone's content width so
+              it never forces horizontal overflow; SVGs scale via maxWidth) */}
+          <div style={{ flex: '1 1 600px', minWidth: 260, display: 'flex', flexDirection: 'column', gap: 6 }}>
             <Section step="1" title="Side view — cut this profile first" hint="band saw">
               {/* width(mm) MUST equal viewBox width(units) for true 1:1 print scale */}
               <svg

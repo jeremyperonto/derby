@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useViewport } from '../app/useViewport'
 import { sfx } from '../audio/audio'
 import { speak } from '../audio/narration'
 import { LESSONS } from '../content/lessons'
@@ -36,6 +37,7 @@ export function ResultsScreen() {
   const rematch = useRaceStore((s) => s.rematch)
   const recordWin = useProgressStore((s) => s.recordWin)
   const [showNotes, setShowNotes] = useState(false)
+  const { compact } = useViewport()
 
   // compute outcome + tips + progress ONCE per race
   const outcome = useMemo(() => {
@@ -98,10 +100,13 @@ export function ResultsScreen() {
         inset: 0,
         display: 'flex',
         flexDirection: 'column',
-        alignItems: 'flex-start',
-        justifyContent: 'center',
-        padding: '14px 0 14px 18px',
-        pointerEvents: 'none',
+        alignItems: compact ? 'center' : 'flex-start',
+        // `safe center` keeps the panel centered but falls back to top-aligned
+        // when it's taller than the screen, so the headline never gets clipped
+        // above an unscrollable edge (the classic flex-centering + overflow bug)
+        justifyContent: 'safe center',
+        padding: compact ? '12px 10px' : '14px 0 14px 18px',
+        pointerEvents: 'auto',
         overflowY: 'auto',
       }}
     >
@@ -111,8 +116,10 @@ export function ResultsScreen() {
           border: '2px solid var(--ink)',
           boxShadow: 'inset 0 0 0 4px var(--paper), inset 0 0 0 5.5px var(--ink)',
           borderRadius: 2,
-          padding: '20px 26px',
-          width: 'min(540px, 92vw)',
+          padding: compact ? '16px 18px' : '20px 26px',
+          width: '100%',
+          maxWidth: 540,
+          flexShrink: 0,
           pointerEvents: 'auto',
           color: 'var(--ink)',
         }}
