@@ -13,7 +13,7 @@ import { CAR_LENGTH_M, TUNING, type Tuning } from './tuning'
  *   m_eff · dv/dt =  m·g·sinφ(s_com)                        gravity at the CoM
  *                  − (μ_axle·(r_a/r_w) + μ_roll)·m·g·cosφ    axle + rolling friction
  *                  − ½·ρ·Cd·A·v² · aeroGain                  air drag
- *   m_eff = m + n_spin · I_w/r_w²                            wheels steal energy to spin
+ *   m_eff = m + 4 · I_w/r_w²                                 wheels steal energy to spin
  *
  * Gravity is evaluated where the CENTER OF MASS sits on the track curve —
  * that single geometric fact reproduces the real rear-weight advantage
@@ -89,7 +89,7 @@ export function runRace(
       if (sim.done) continue
       allDone = false
 
-      const mEff = car.massKg + car.spinningWheels * car.wheelIOverR2Kg
+      const mEff = car.massKg + 4 * car.wheelIOverR2Kg
       const sCom = sim.s - comLeverM(car, t)
       const sinPhi = track.sinAt(sCom)
       const cosPhi = track.cosAt(sCom)

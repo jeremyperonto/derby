@@ -70,8 +70,7 @@ export default function TuningPanel() {
     >
       <h2 style={{ marginBottom: 4 }}>Tuning Panel (dev)</h2>
       <p style={{ marginBottom: 16, color: 'var(--navy)' }}>
-        Targets (lengths vs Wedge Racer): weight ~4 · placement ~2–3 · friction ~2 · aero ~1 ·
-        raised ~0.3
+        Targets (lengths vs Wedge Racer): weight ~4 · placement ~2–3 · friction ~2 · aero ~1
       </p>
 
       <div style={{ display: 'flex', gap: 32, flexWrap: 'wrap', alignItems: 'flex-start' }}>

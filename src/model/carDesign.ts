@@ -84,7 +84,6 @@ export const weightPlugSchema = z.object({
 export type WeightPlug = z.infer<typeof weightPlugSchema>
 
 export const wheelSetupSchema = z.object({
-  raised: z.enum(['none', 'frontLeft']),
   polish: z.number().int().min(0).max(3),
   graphite: z.number().int().min(0).max(3),
   // v2 "expert garage" reserves: alignment { steerDeg }
@@ -134,7 +133,7 @@ export function freshCarDesign(id: string, now: number): CarDesign {
     updatedAt: now,
     carve: { ops: [] },
     weights: [],
-    wheels: { raised: 'none', polish: 0, graphite: 0 },
+    wheels: { polish: 0, graphite: 0 },
     paint: { body: 'brickRed', wheels: 'ink' },
     decals: [],
   }

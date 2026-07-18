@@ -74,13 +74,12 @@ Two live meters teach the two weight lessons:
 
 ### 3.3 Wheels station
 
-Three controls, each a labeled letterpress group with segmented levels:
+Two controls, each a labeled letterpress group with segmented levels:
 
 - **Axle polish** (0–3: rough → mirror, in fiction: "shine up the nails")
 - **Graphite** (0–3 puffs — the classic derby lube, with a *pff* sound)
-- **Raised wheel** toggle — lift one front wheel so only three touch ("three shoes rub less than four!")
 
-A live **Squeak-O-Meter** turns the resulting friction into a whisper-quiet↔squeaky gauge. *(v2 "Expert Garage": axle alignment / rail-riding.)*
+A live **Squeak-O-Meter** turns the resulting friction into a whisper-quiet↔squeaky gauge. *(A "raised wheel" toggle was cut: in a 1-D sim it only rewards the tiny spin-up saving while ignoring the real cost — a lifted corner wheel shifts weight off-center and steers into the rail. Deferred to a v2 "Expert Garage" that can model axle alignment / rail-riding.)*
 
 ### 3.4 Paint & decals station
 
@@ -136,7 +135,7 @@ Nine authored rivals in three **divisions of similar strength**; beat any two ra
 |---|---|---|
 | **Rookie** | Brick Bobby (raw block), Featherweight Flo (3 oz), Plank Paula (unpolished plank) | carve it · total weight · friction |
 | **Challenger** | Nose-Heavy Ned (nose weight), Squeaky Pete (no prep), Middleweight Mel (dead-center weight) | placement · friction · placement |
-| **Champion** | Barn-Door Barb (tall brick), Tailfin Tina (four wheels down), Lightning Lena (boss) | aero · raised wheel · everything |
+| **Champion** | Barn-Door Barb (tall brick), Tailfin Tina (under-graphited), Lightning Lena (boss) | aero · friction · everything |
 
 - Each rival's card shows their **actual car's side-profile**, a tagline, and an intro hinting at the flaw. Cards are grouped under division headers; locked divisions show the entry requirement.
 - **Winning = winning the heat** (1st of 4). Fillers are capped below the rival (§4.2), so the honest lesson always decides it.
@@ -169,7 +168,7 @@ m_eff = m + (spinning wheels)·I_wheel/r_wheel²                 ← wheels stea
 
 The crucial detail: **gravity is evaluated where the center of mass is on the track curve**, not at the nose. A rear-weighted car starts its mass higher and keeps it on the slope longer through the ramp-to-flat transition — so it extracts more potential energy and releases it later. That single geometric fact reproduces the real rear-weight advantage (slightly slower off the gate, pulling ahead at the bottom) with no hacks, and it's exactly the story the post-race feedback tells.
 
-Garage choices map to physical coefficients via one pure function (`deriveSimParams`): carved shape → mass, center of mass, frontal area, drag coefficient (bluntness penalty, tail-taper and rounded-edge credits); wheel prep → axle friction; raised wheel → one less spinning wheel. Track: 24° ramp, circular transition, flat run; ~1.19 m start height; finish ≈ 2.9–3.1 s — matching real aluminum-track times.
+Garage choices map to physical coefficients via one pure function (`deriveSimParams`): carved shape → mass, center of mass, frontal area, drag coefficient (bluntness penalty, tail-taper and rounded-edge credits); wheel prep → axle friction. Track: 24° ramp, circular transition, flat run; ~1.19 m start height; finish ≈ 2.9–3.1 s — matching real aluminum-track times.
 
 ### 6.3 Tuning targets
 
@@ -290,7 +289,7 @@ Full conventions and architecture rules: see `CLAUDE.md`.
 
 ## 12. v1 scope
 
-**Shipped:** carve/sand/scoop/round + templates · weights + scale + balance bubble · wheel prep + raised wheel · paint/draped stickers/number/name · car wall (multi-save) · 4-lane 3D race with follow-cam + universal slow-mo finish + medals + lane light + auto instant replay + photo finish · 9 rivals in 3 divisions + capped filler cars · stars + cosmetic unlocks (prize every win) · winner's circle + spec sheet · counterfactual feedback · Pit Crew Notes · Web Audio SFX/mute · optional narration · 1:1 blueprint print export · local best times.
+**Shipped:** carve/sand/scoop/round + templates · weights + scale + balance bubble · wheel prep (polish + graphite) · paint/draped stickers/number/name · car wall (multi-save) · 4-lane 3D race with follow-cam + universal slow-mo finish + medals + lane light + auto instant replay + photo finish · 9 rivals in 3 divisions + capped filler cars · stars + cosmetic unlocks (prize every win) · winner's circle + spec sheet · counterfactual feedback · Pit Crew Notes · Web Audio SFX/mute · optional narration · 1:1 blueprint print export · local best times.
 
 **Roadmap (post-v1):**
 

@@ -159,7 +159,7 @@ export function ResultsScreen() {
           const winnerLane = raceData.order[0]!
           const winner = lanes[winnerLane]!
           const spec = deriveSimParams(winner.design)
-          const { polish, graphite, raised } = winner.design.wheels
+          const { polish, graphite } = winner.design.wheels
           const behindRearAxle = AXLE_X_IN.rear - spec.comXIn
           const inZone = behindRearAxle >= 0.25 && behindRearAxle <= 1.5
           const shape =
@@ -226,7 +226,6 @@ export function ResultsScreen() {
                     label="Axles"
                     value={`${POLISH_WORDS[polish]} polish · ${graphite === 0 ? 'no' : graphite} puff${graphite === 1 ? '' : 's'} of graphite`}
                   />
-                  <SpecRow label="Wheels" value={raised === 'none' ? 'all four down' : 'front wheel raised — only three rub'} />
                   <SpecRow label="Shape" value={shape} />
                 </div>
               </fieldset>

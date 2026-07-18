@@ -69,7 +69,7 @@ R3F/WebGL often won't initialize (or can't be screenshotted) in the automated Ch
 
 ## Tuning workflow
 
-The physics *feel* is the hardest part. Use the dev-only tuning panel (dev route, not in prod nav): sliders over every `tuning.ts` constant + live finish-time table for the canonical test cars. Target margins (car lengths on a ~3 s heat): weight ~4, placement ~2–3, friction ~2, aero ~1, raised wheel ~0.3, seeded wobble ±0.3. After any retune, update the golden test snapshot deliberately — golden tests exist to make physics changes loud, not to forbid them.
+The physics *feel* is the hardest part. Use the dev-only tuning panel (dev route, not in prod nav): sliders over every `tuning.ts` constant + live finish-time table for the canonical test cars. Target margins (car lengths on a ~3 s heat): weight ~4, placement ~2–3, friction ~2, aero ~1, seeded wobble ±0.3. After any retune, update the golden test snapshot deliberately — golden tests exist to make physics changes loud, not to forbid them.
 
 ## Progression & rivals
 

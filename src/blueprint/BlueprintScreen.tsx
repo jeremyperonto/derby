@@ -221,7 +221,6 @@ export function BlueprintScreen() {
                     ['Balance', `${derived.comXIn.toFixed(2)}″ from the nose — balance it there on a pencil`],
                     ['Polish', ['none — sand them!', 'fine sandpaper', 'wet-sand smooth', 'polish to a mirror'][design.wheels.polish]!],
                     ['Graphite', design.wheels.graphite === 0 ? 'none — add some!' : `${design.wheels.graphite} good puff${design.wheels.graphite > 1 ? 's' : ''} per axle`],
-                    ['Wheels', design.wheels.raised === 'none' ? 'all four touching' : 'raise the front-left a hair off the track'],
                   ].map(([k, v]) => (
                     <tr key={k}>
                       <td

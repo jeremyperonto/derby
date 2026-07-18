@@ -3,12 +3,12 @@
  * concrete, sayable) and a Pit Crew Note — a script for a grown-up to read
  * aloud and discuss, one level deeper. See design.md §6.
  */
-export type LessonId = 'carve' | 'weight' | 'placement' | 'friction' | 'aero' | 'wheels'
+export type LessonId = 'carve' | 'weight' | 'placement' | 'friction' | 'aero'
 
 export interface Lesson {
   id: LessonId
   /** id into the SVG icon set (ui/icons.tsx LESSON_ICONS) */
-  icon: 'saw' | 'scale' | 'weightBack' | 'sparkle' | 'wind' | 'lift'
+  icon: 'saw' | 'scale' | 'weightBack' | 'sparkle' | 'wind'
   title: string
   kidLine: string
   /** concrete post-race tip template; {gain} = car lengths gained */
@@ -67,15 +67,5 @@ export const LESSONS: Record<LessonId, Lesson> = {
     parentScript:
       'Air does not feel like much, but at racing speed the car has to push a car-sized tunnel through it the whole way down. A low wedge moves less air, and rounded edges let the air close smoothly behind it instead of tumbling. That tumbling — turbulence — pulls backward like a tiny parachute.',
     tryAtHome: 'Drop two identical sheets of paper: one flat, one crumpled into a ball. Same weight — why does one lose to the air?',
-  },
-  wheels: {
-    id: 'wheels',
-    icon: 'lift',
-    title: 'Three shoes rub less than four',
-    kidLine: 'Lift one front wheel off the track — three wheels rub less than four!',
-    tipLine: 'Raising one front wheel would have found you {gain} more!',
-    parentScript:
-      'Every spinning wheel costs twice: friction on its axle, and the energy it takes just to make the wheel spin up. Real derby champions set one front wheel a hair higher so it never touches — the car rides on three. It sounds like cheating; it is just counting. Fewer touching wheels, less rubbing.',
-    tryAtHome: 'Spin a bike wheel and count how long it coasts. Now press a finger lightly on the rim. That gentle touch is what a fourth wheel costs.',
   },
 }

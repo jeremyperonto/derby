@@ -2,16 +2,16 @@ import { useGarageStore } from '../state/garageStore'
 import { Fieldset, Seg } from '../ui/Fieldset'
 
 /**
- * Wheels station: axle polish, graphite, raised wheel — the friction
- * lessons, each a labeled letterpress control group. The Squeak-O-Meter
- * makes μ tangible for a six-year-old.
+ * Wheels station: axle polish + graphite — the friction lessons, each a
+ * labeled letterpress control group. The Squeak-O-Meter makes μ tangible for
+ * a six-year-old.
  */
 export function WheelsView() {
   const design = useGarageStore((s) => s.design)
   const derived = useGarageStore((s) => s.derived)
   const setWheels = useGarageStore((s) => s.setWheels)
 
-  const { polish, graphite, raised } = design.wheels
+  const { polish, graphite } = design.wheels
 
   // μ ranges roughly 0.08 (best) … 0.30 (worst) — map to a 0..1 squeak score
   const squeak = Math.max(0, Math.min(1, (derived.params.muAxle - 0.08) / 0.22))
@@ -40,17 +40,6 @@ export function WheelsView() {
             { value: 1, label: '1 puff' },
             { value: 2, label: '2 puffs' },
             { value: 3, label: '3 puffs' },
-          ]}
-        />
-      </Fieldset>
-
-      <Fieldset legend="Raised wheel — three shoes rub less than four" contentStyle={{ flexDirection: 'column', alignItems: 'flex-start' }}>
-        <Seg
-          value={raised}
-          onChange={(r) => setWheels({ raised: r as 'none' | 'frontLeft' })}
-          options={[
-            { value: 'none', label: 'All four down' },
-            { value: 'frontLeft', label: 'Front wheel up' },
           ]}
         />
       </Fieldset>

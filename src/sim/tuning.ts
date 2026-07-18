@@ -4,7 +4,7 @@
  *
  * Factor-spread targets on a ~3 s heat, in car lengths (1 length ≈ 178 mm):
  *   total weight (3.5→5 oz) ~4 · placement (nose→rear) ~2–3 · friction ~2 ·
- *   aero (brick→wedge) ~1 · raised wheel ~0.3 · seeded wobble ±0.3
+ *   aero (brick→wedge) ~1 · seeded wobble ±0.3
  */
 export interface Tuning {
   // --- track geometry ---
@@ -38,7 +38,6 @@ export interface Tuning {
   muAxleBase: number
   polishCut: [number, number, number, number] // μ reduction per polish level 0–3
   graphiteCut: [number, number, number, number] // μ reduction per graphite level 0–3
-  raisedWheelMuFactor: number // × axle μ when one wheel is raised (3 wheels touching)
 
   // --- aero (Cd heuristic from carve profile) ---
   cdBase: number
@@ -85,7 +84,6 @@ export const TUNING: Tuning = {
   muAxleBase: 0.3,
   polishCut: [0, 0.07, 0.12, 0.15],
   graphiteCut: [0, 0.04, 0.06, 0.07],
-  raisedWheelMuFactor: 0.94,
 
   cdBase: 0.55,
   cdBluntGain: 0.45,

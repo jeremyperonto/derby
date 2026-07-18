@@ -24,7 +24,7 @@ export const SHOWCASE_CARS: CarDesign[] = [
       { slot: 6, kind: 'tungsten' },
       { slot: 5, kind: 'tungsten' },
     ],
-    wheels: { raised: 'none', polish: 3, graphite: 3 },
+    wheels: { polish: 3, graphite: 3 },
   }),
   show({
     name: 'Midnight Streak',
@@ -33,7 +33,7 @@ export const SHOWCASE_CARS: CarDesign[] = [
     paint: { body: 'navy', wheels: 'brickRed' },
     decals: [{ slot: 'sideRear', decalId: 'stripes' }],
     weights: [{ slot: 6, kind: 'tungsten' }],
-    wheels: { raised: 'none', polish: 2, graphite: 2 },
+    wheels: { polish: 2, graphite: 2 },
   }),
   show({
     name: 'Tub Thumper',
@@ -42,7 +42,7 @@ export const SHOWCASE_CARS: CarDesign[] = [
     paint: { body: 'skyBlue', wheels: 'ink' },
     decals: [{ slot: 'sideFront', decalId: 'eyes' }],
     weights: [{ slot: 5, kind: 'tungsten' }],
-    wheels: { raised: 'none', polish: 1, graphite: 1 },
+    wheels: { polish: 1, graphite: 1 },
   }),
   show({
     name: 'The Checker',
@@ -57,7 +57,7 @@ export const SHOWCASE_CARS: CarDesign[] = [
       { slot: 6, kind: 'tungsten' },
       { slot: 7, kind: 'steel' },
     ],
-    wheels: { raised: 'frontLeft', polish: 3, graphite: 3 },
+    wheels: { polish: 3, graphite: 3 },
   }),
   show({
     name: 'Clover Cruiser',
@@ -66,6 +66,6 @@ export const SHOWCASE_CARS: CarDesign[] = [
     paint: { body: 'forest', wheels: 'paper' },
     decals: [{ slot: 'roof', decalId: 'star' }],
     weights: [{ slot: 6, kind: 'steel' }],
-    wheels: { raised: 'none', polish: 2, graphite: 3 },
+    wheels: { polish: 2, graphite: 3 },
   }),
 ]

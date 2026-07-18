@@ -33,7 +33,7 @@ const NOSE_PLUGS: WeightPlug[] = [
   { slot: 1, kind: 'tungsten' }, // x=1.7
 ]
 
-const FULL_PREP = { raised: 'none', polish: 3, graphite: 3 } as const
+const FULL_PREP = { polish: 3, graphite: 3 } as const
 
 export const TEST_CARS: Record<string, CarDesign> = {
   /** the reference: wedge, rear-weighted toward 5 oz, full prep */
@@ -64,20 +64,13 @@ export const TEST_CARS: Record<string, CarDesign> = {
   squeakyWedge: car('t-squeaky', 'Squeaky Wedge', {
     carve: { ops: wedgeOps },
     weights: REAR_PLUGS,
-    wheels: { raised: 'none', polish: 0, graphite: 0 },
+    wheels: { polish: 0, graphite: 0 },
   }),
 
   /** aero factor: uncarved brick but same weights/prep as the reference */
   brickRacer: car('t-brickracer', 'Weighted Brick', {
     weights: REAR_PLUGS,
     wheels: { ...FULL_PREP },
-  }),
-
-  /** wheel-setup factor: reference + raised front wheel */
-  triWheel: car('t-triwheel', 'Tri-Wheel', {
-    carve: { ops: wedgeOps },
-    weights: REAR_PLUGS,
-    wheels: { ...FULL_PREP, raised: 'frontLeft' },
   }),
 
   /** a mastery build: low + slim + rounded, max legal rear weight, everything applied */
@@ -96,6 +89,6 @@ export const TEST_CARS: Record<string, CarDesign> = {
       { slot: 8, kind: 'steel' },
       { slot: 4, kind: 'steel' },
     ],
-    wheels: { ...FULL_PREP, raised: 'frontLeft' },
+    wheels: { ...FULL_PREP },
   }),
 }

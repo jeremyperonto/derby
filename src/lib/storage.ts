@@ -11,7 +11,7 @@ import { applyMigrations } from '../model/migrations'
  */
 
 const KEY = 'derby:v1'
-const SCHEMA_VERSION = 1
+const SCHEMA_VERSION = 2
 const SAVE_DEBOUNCE_MS = 1000
 
 export interface SaveDoc {

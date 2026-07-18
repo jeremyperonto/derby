@@ -20,8 +20,7 @@ export interface CarSimParams {
   frontalAreaM2: number
   dragCd: number
   muAxle: number
-  spinningWheels: 3 | 4
-  /** effective rotational mass per spinning wheel, kg */
+  /** effective rotational mass per wheel, kg (all four spin) */
   wheelIOverR2Kg: number
 }
 
@@ -60,10 +59,9 @@ export function deriveSimParams(design: CarDesign, t: Tuning = TUNING): DerivedC
   const comXIn = momentKgIn / massKg
 
   // --- friction from wheel prep ---
-  const { polish, graphite, raised } = design.wheels
+  const { polish, graphite } = design.wheels
   let muAxle =
     t.muAxleBase - t.polishCut[polish]! - t.graphiteCut[graphite]!
-  if (raised !== 'none') muAxle *= t.raisedWheelMuFactor
   // spread gain pivots about the mid prep level so the mean stays put
   muAxle = t.muMid + (muAxle - t.muMid) * t.frictionSpreadGain
 
@@ -76,7 +74,6 @@ export function deriveSimParams(design: CarDesign, t: Tuning = TUNING): DerivedC
       frontalAreaM2: body.frontalAreaM2 + t.wheelFrontalAreaM2,
       dragCd: body.dragCd,
       muAxle,
-      spinningWheels: raised === 'none' ? 4 : 3,
       wheelIOverR2Kg: t.wheelIOverR2G * G_TO_KG,
     },
     totalOz,

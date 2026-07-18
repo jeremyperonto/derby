@@ -88,10 +88,6 @@ describe('physics ordering invariants (must hold under ANY retune)', () => {
     expect(soloTime('wedgeRacer')).toBeLessThan(soloTime('brickRacer'))
   })
 
-  it('raised wheel beats four on the floor', () => {
-    expect(soloTime('triWheel')).toBeLessThan(soloTime('wedgeRacer'))
-  })
-
   it('rear weight pays off AT THE TRANSITION, not on the ramp (the teachable signature)', () => {
     const noWobble = { ...TUNING, wobble: 0 }
     const race = runRace([p('wedgeRacer'), p('noseWedge')], SEED, noWobble)
@@ -119,7 +115,6 @@ describe('factor spreads (car lengths on a ~3 s heat — see tuning targets)', (
       ['placement (rear vs nose)', marginLengths('wedgeRacer', 'noseWedge'), 1.5, 4],
       ['friction (prep vs squeaky)', marginLengths('wedgeRacer', 'squeakyWedge'), 1.2, 3.5],
       ['aero (wedge vs brick)', marginLengths('wedgeRacer', 'brickRacer'), 0.5, 2],
-      ['raised wheel', marginLengths('triWheel', 'wedgeRacer'), 0.1, 0.8],
     ] as const
 
     const report = rows

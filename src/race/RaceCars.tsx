@@ -37,12 +37,12 @@ export function RaceCars() {
       g.position.set(pose.x, pose.y + WHEEL_DROP_IN, laneZ(lane))
       g.rotation.z = pose.pitch
 
-      // spin the wheels to match ground speed (raised wheel stays still — kids notice)
+      // spin the wheels to match ground speed
       const vInPerS = trace.v[i0]! / 0.0254
       const spin = (vInPerS * delta * playback.timeScale) / 0.59 // ω = v/r
       if (spin > 0) {
         g.traverse((o) => {
-          if (o.userData.isWheel && !o.userData.raised) o.rotation.z -= spin
+          if (o.userData.isWheel) o.rotation.z -= spin
         })
       }
 

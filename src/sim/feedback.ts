@@ -91,13 +91,6 @@ const VARIANTS: Variant[] = [
       return { ...design, carve: { ops: [...design.carve.ops, wedge, round] } }
     },
   },
-  {
-    lesson: 'wheels',
-    build: (design) =>
-      design.wheels.raised !== 'none'
-        ? null
-        : { ...design, wheels: { ...design.wheels, raised: 'frontLeft' } },
-  },
 ]
 
 /**

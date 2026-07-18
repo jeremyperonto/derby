@@ -89,7 +89,7 @@ describe('rivals ladder', () => {
 
   it('a mastery build can beat Lena (the boss is winnable, but demands a real carve)', () => {
     const noWobble = { ...TUNING, wobble: 0 }
-    const player = TEST_CARS.champion! // low+slim+rounded, max legal rear weight, raised
+    const player = TEST_CARS.champion! // low+slim+rounded, max legal rear weight, full prep
     const derived = deriveSimParams(player, noWobble)
     expect(derived.overweight, `champion must be race-legal, is ${derived.totalOz}oz`).toBe(false)
     const lena = rivalById('lena')!.design

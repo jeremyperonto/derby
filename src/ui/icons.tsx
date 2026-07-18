@@ -202,14 +202,6 @@ export const IconStar = (p: IconProps) => (
   </I>
 )
 
-/** raised-wheel balloon-lift concept: wheel with an up arrow */
-export const IconLift = (p: IconProps) => (
-  <I {...p}>
-    <circle cx={12} cy={16} r={5} />
-    <path d="M12 8V2M9 4.5 12 2l3 2.5" />
-  </I>
-)
-
 /** graphite puff cloud */
 export const IconPuff = (p: IconProps) => (
   <I {...p}>
@@ -283,7 +275,6 @@ export const LESSON_ICONS = {
   weightBack: IconWeightBack,
   sparkle: IconSparkle,
   wind: IconWind,
-  lift: IconLift,
 } as const
 
 export function LessonIcon({ id, size }: { id: keyof typeof LESSON_ICONS; size?: number }) {

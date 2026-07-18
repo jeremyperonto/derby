@@ -107,7 +107,6 @@ export const WHEEL_RADIUS_IN = 0.59
 export const AXLE_Y_IN = 0.3
 export const WHEEL_DROP_IN = WHEEL_RADIUS_IN - AXLE_Y_IN // how far wheels hang below the body
 const WHEEL_WIDTH_IN = 0.32
-const RAISED_LIFT_IN = 0.09
 
 export function CarBody({
   design,
@@ -122,20 +121,16 @@ export function CarBody({
   const wheelColor = PALETTE[design.paint.wheels] ?? PALETTE.ink
 
   const wheels = useMemo(() => {
-    const out: { x: number; z: number; raised: boolean }[] = []
+    const out: { x: number; z: number }[] = []
     for (const axle of ['front', 'rear'] as const) {
       const x = AXLE_X_IN[axle]
       const hw = buffers.halfWidth[idxAt(x)]!
       for (const side of [-1, 1]) {
-        out.push({
-          x,
-          z: side * (hw + WHEEL_WIDTH_IN / 2 + 0.02),
-          raised: axle === 'front' && side === -1 && design.wheels.raised === 'frontLeft',
-        })
+        out.push({ x, z: side * (hw + WHEEL_WIDTH_IN / 2 + 0.02) })
       }
     }
     return out
-  }, [buffers, design.wheels.raised])
+  }, [buffers])
 
   return (
     <group>
@@ -147,8 +142,8 @@ export function CarBody({
         /* wrapper group spins about z (the axle direction); RaceCars drives it */
         <group
           key={i}
-          position={[w.x, AXLE_Y_IN + (w.raised ? RAISED_LIFT_IN : 0), w.z]}
-          userData={{ isWheel: true, raised: w.raised }}
+          position={[w.x, AXLE_Y_IN, w.z]}
+          userData={{ isWheel: true }}
         >
           <mesh rotation={[Math.PI / 2, 0, 0]}>
             <cylinderGeometry args={[WHEEL_RADIUS_IN, WHEEL_RADIUS_IN, WHEEL_WIDTH_IN, 14]} />

@@ -5,7 +5,17 @@
  * migrating cleanly (CLAUDE.md rule 8).
  */
 export const MIGRATIONS: Record<number, (doc: unknown) => unknown> = {
-  // none yet — v1 is the first released schema
+  // v1 → v2: the "raised wheel" setup was removed (it modeled a benefit the
+  // 1-D sim couldn't fairly price — a corner wheel lifted off-center just
+  // shifts weight and steers). Strip the dead `wheels.raised` field so old
+  // saves keep loading cleanly.
+  1: (doc) => {
+    const d = doc as { cars?: { wheels?: Record<string, unknown> }[] }
+    for (const car of d.cars ?? []) {
+      if (car.wheels && 'raised' in car.wheels) delete car.wheels.raised
+    }
+    return doc
+  },
 }
 
 export function applyMigrations(doc: { schemaVersion?: number }, targetVersion: number): unknown {
