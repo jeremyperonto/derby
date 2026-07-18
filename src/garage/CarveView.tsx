@@ -1,7 +1,8 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import type { PointerEvent } from 'react'
 import { sfx } from '../audio/audio'
 import { idxAt, N, xAt } from '../carve/buffers'
+import { TEMPLATES } from '../content/templates'
 import {
   AXLE_X_IN,
   BLOCK,
@@ -10,6 +11,7 @@ import {
   type CarveOp,
 } from '../model/carDesign'
 import { useGarageStore } from '../state/garageStore'
+import { Btn } from '../ui/Btn'
 import { AXLE_Y_IN, WHEEL_RADIUS_IN } from './CarBody'
 
 const WHEEL_WIDTH_IN = 0.32
@@ -24,6 +26,7 @@ const WHEEL_WIDTH_IN = 0.32
 const TOOL_R = { scoop: 0.45, sand: 0.55 } as const
 const SAMPLE_STEP = 4 // buffer samples per SVG point
 const MIN_STROKE_DIST = 0.06 // inches between recorded stroke points
+const TOOL_VERB = { slice: 'slice', scoop: 'scoop', sand: 'smooth' } as const
 
 export function CarveView() {
   const view = useGarageStore((s) => s.view)
@@ -32,6 +35,10 @@ export function CarveView() {
   const draftOp = useGarageStore((s) => s.draftOp)
   const setDraft = useGarageStore((s) => s.setDraft)
   const commitDraft = useGarageStore((s) => s.commitDraft)
+  const opsCount = useGarageStore((s) => s.design.carve.ops.length)
+  const applyTemplate = useGarageStore((s) => s.applyTemplate)
+  // teach the drag gesture until the first time they touch the block
+  const [touched, setTouched] = useState(false)
 
   const svgRef = useRef<SVGSVGElement>(null)
   const gesture = useRef<{ start: [number, number]; stroke: [number, number][] } | null>(null)
@@ -59,6 +66,7 @@ export function CarveView() {
   }
 
   const onDown = (e: PointerEvent<SVGSVGElement>) => {
+    setTouched(true)
     const p = toInches(e)
     if (!p) return
     // gesture FIRST — capture is best-effort and can throw ("no active
@@ -134,6 +142,7 @@ export function CarveView() {
       <div className="lp-label" style={{ fontSize: '0.66rem', color: 'var(--navy)' }}>
         « nose — {view === 'side' ? 'side view' : 'top view · dashed boxes show where the wheels mount'}
       </div>
+    <div style={{ position: 'relative', flex: 1, minHeight: 0, display: 'flex' }}>
     <svg
       ref={svgRef}
       viewBox={`${-PAD} ${-PAD} ${BLOCK.lengthIn + 2 * PAD} ${H + 2 * PAD}`}
@@ -237,6 +246,68 @@ export function CarveView() {
       )}
 
     </svg>
+
+      {/* empty state on a fresh block: pick a starting shape (this also
+          teaches the shape-first → carve-deeper sequence) */}
+      {opsCount === 0 && (
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 10,
+            padding: 12,
+            pointerEvents: 'none',
+          }}
+        >
+          <div
+            className="lp-label"
+            style={{
+              fontSize: '0.8rem',
+              color: 'var(--navy)',
+              background: 'var(--paper)',
+              border: '2px solid var(--ink)',
+              borderRadius: 2,
+              padding: '4px 12px',
+            }}
+          >
+            Start with a shape
+          </div>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center', pointerEvents: 'auto' }}>
+            {TEMPLATES.map((t) => (
+              <Btn key={t.id} size="sm" onClick={() => applyTemplate(t.ops)} title={`start from a ${t.name}`}>
+                {t.name}
+              </Btn>
+            ))}
+          </div>
+          <div className="lp-label" style={{ fontSize: '0.56rem', color: 'var(--ink)', opacity: 0.55 }}>
+            …or just drag on the block
+          </div>
+        </div>
+      )}
+
+      {/* once shaped, a fading hint that the surface is a canvas you drag on */}
+      {opsCount > 0 && !touched && (
+        <div style={{ position: 'absolute', left: 0, right: 0, bottom: 6, display: 'flex', justifyContent: 'center', pointerEvents: 'none' }}>
+          <div
+            className="lp-label"
+            style={{
+              fontSize: '0.62rem',
+              color: 'var(--navy)',
+              background: 'var(--paper)',
+              border: '1.5px solid var(--ink)',
+              borderRadius: 2,
+              padding: '3px 10px',
+            }}
+          >
+            drag across the block to {TOOL_VERB[tool]}
+          </div>
+        </div>
+      )}
+    </div>
     </div>
   )
 }

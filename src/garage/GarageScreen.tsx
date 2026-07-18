@@ -1,7 +1,6 @@
 import { useEffect, useRef, type ReactNode } from 'react'
 import { sfx } from '../audio/audio'
 import { useViewport } from '../app/useViewport'
-import { TEMPLATES } from '../content/templates'
 import { useAppStore } from '../state/appStore'
 import { useGarageStore, type CarveTool, type GarageStation } from '../state/garageStore'
 import { Btn } from '../ui/Btn'
@@ -255,7 +254,7 @@ function CarveStation() {
   const tool = useGarageStore((s) => s.tool)
   const view = useGarageStore((s) => s.view)
   const design = useGarageStore((s) => s.design)
-  const { setTool, setView, resetBlock, applyTemplate, setEdgeRound } = useGarageStore.getState()
+  const { setTool, setView, resetBlock, setEdgeRound } = useGarageStore.getState()
 
   const roundR = (() => {
     const op = [...design.carve.ops].reverse().find((o) => o.t === 'round')
@@ -264,45 +263,40 @@ function CarveStation() {
 
   return (
     <>
-      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-        <Fieldset legend="View">
-          <Seg
-            size="sm"
-            value={view}
-            onChange={setView}
-            options={[
-              { value: 'side', label: <><IconSideView size={16} /> Side</> },
-              { value: 'top', label: <><IconTopView size={16} /> Top</> },
-            ]}
-          />
-        </Fieldset>
-        <Fieldset legend="Tools" style={{ flex: 1 }}>
-          <Seg
-            size="sm"
-            value={tool}
-            onChange={(t) => setTool(t as CarveTool)}
-            options={[
-              { value: 'slice', label: <><IconSaw size={16} /> Slice</>, title: 'one straight cut' },
-              { value: 'scoop', label: <><IconScoop size={16} /> Scoop</>, title: 'carve a groove' },
-              { value: 'sand', label: <><IconSand size={16} /> Sand</>, title: 'smooth it out' },
-            ]}
-          />
-        </Fieldset>
+      {/* compact toolbar — what you're looking at (Side/Top) on the left,
+          what the finger does (Slice/Scoop/Sand) on the right */}
+      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
+        <Seg
+          size="sm"
+          value={view}
+          onChange={setView}
+          options={[
+            { value: 'side', label: <><IconSideView size={16} /> Side</> },
+            { value: 'top', label: <><IconTopView size={16} /> Top</> },
+          ]}
+        />
+        <div style={{ flex: 1 }} />
+        <Seg
+          size="sm"
+          value={tool}
+          onChange={(t) => setTool(t as CarveTool)}
+          options={[
+            { value: 'slice', label: <><IconSaw size={16} /> Slice</>, title: 'one straight cut' },
+            { value: 'scoop', label: <><IconScoop size={16} /> Scoop</>, title: 'carve a groove' },
+            { value: 'sand', label: <><IconSand size={16} /> Sand</>, title: 'smooth it out' },
+          ]}
+        />
       </div>
 
+      {/* the surface is the star — starter shapes live inside it as the
+          fresh-block empty state, so it gets nearly all the height */}
       <div style={{ flex: 1, minHeight: 0 }}>
         <CarveView />
       </div>
 
-      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'stretch' }}>
-        <Fieldset legend="Starter shapes">
-          {TEMPLATES.map((t) => (
-            <Btn key={t.id} size="sm" onClick={() => applyTemplate(t.ops)} title={`start from a ${t.name}`}>
-              {t.name}
-            </Btn>
-          ))}
-        </Fieldset>
-        <Fieldset legend="Round the edges" style={{ flex: 1, minWidth: 170 }}>
+      {/* slim footer: finish with rounded edges, or start fresh */}
+      <div style={{ display: 'flex', gap: 10, alignItems: 'stretch' }}>
+        <Fieldset legend="Round the edges" style={{ flex: 1, minWidth: 0 }}>
           <input
             type="range"
             min={0}

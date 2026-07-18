@@ -63,6 +63,9 @@ export function Seg<T extends string | number>({
         borderRadius: 2,
         background: 'var(--paper)',
         overflow: 'hidden',
+        // never let the control shrink below its options — that silently
+        // clipped the last segment (e.g. the Sand tool) on narrow screens
+        flexShrink: 0,
       }}
     >
       {options.map((option, i) => {
@@ -87,6 +90,7 @@ export function Seg<T extends string | number>({
               display: 'inline-flex',
               alignItems: 'center',
               gap: 6,
+              whiteSpace: 'nowrap',
               touchAction: 'manipulation',
             }}
           >
