@@ -69,12 +69,17 @@ export function WeightsView() {
         </div>
       </div>
 
-      {/* underside of the car */}
+      {/* caption out of the SVG so the drawing can be tight to the block */}
+      <div className="lp-label" style={{ fontSize: '0.64rem', color: 'var(--navy)' }}>
+        « nose — looking at the bottom of the car
+      </div>
+      {/* underside of the car — aspect-locked so the block FILLS its box
+          instead of floating in letterbox (it's the star: you tap it) */}
+      <div style={{ flex: 1, minHeight: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <svg
-        viewBox={`-0.4 -0.4 ${BLOCK.lengthIn + 0.8} ${BLOCK.widthIn + 0.8}`}
-        style={{ width: '100%', flex: 1, minHeight: 0 }}
+        viewBox={`-0.2 -0.2 ${BLOCK.lengthIn + 0.4} ${BLOCK.widthIn + 0.4}`}
+        style={{ width: '100%', maxHeight: '100%', aspectRatio: String((BLOCK.lengthIn + 0.4) / (BLOCK.widthIn + 0.4)) }}
       >
-        {/* no workbench backdrop — the car sits on the paper */}
         {/* body outline from the live top profile (underside silhouette) */}
         <path d={undersidePath(buffers.halfWidth, mid)} fill="var(--pine)" stroke="var(--ink)" strokeWidth={0.035} />
         {/* axles */}
@@ -140,23 +145,13 @@ export function WeightsView() {
             </g>
           )
         })}
-        <text
-          x={0.02}
-          y={-0.14}
-          fontSize={0.2}
-          fill="var(--ink)"
-          fontWeight={600}
-          fontFamily="Oswald, sans-serif"
-          letterSpacing={0.03}
-        >
-          « NOSE — LOOKING AT THE BOTTOM OF THE CAR
-        </text>
       </svg>
+      </div>
 
       {/* meters row */}
       <div style={{ display: 'flex', gap: 14, alignItems: 'center', flexWrap: 'wrap' }}>
         <Fieldset legend="The official scale" contentStyle={{ flexWrap: 'nowrap' }}>
-          <svg viewBox="0 0 100 62" style={{ width: 150, flexShrink: 0 }}>
+          <svg viewBox="0 0 100 62" style={{ width: 104, flexShrink: 0 }}>
             <path d="M 8 54 A 42 42 0 0 1 92 54" fill="var(--paper)" stroke="var(--ink)" strokeWidth={3} />
             <path d="M 87.4 33.8 A 42 42 0 0 1 92 54" fill="none" stroke="var(--brick-red)" strokeWidth={7} />
             {[0, 1, 2, 3, 4, 5, 6].map((oz) => {
