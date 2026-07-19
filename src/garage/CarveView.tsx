@@ -27,6 +27,11 @@ const TOOL_R = { scoop: 0.45, sand: 0.55 } as const
 const SAMPLE_STEP = 4 // buffer samples per SVG point
 const MIN_STROKE_DIST = 0.06 // inches between recorded stroke points
 const TOOL_VERB = { slice: 'slice', scoop: 'scoop', sand: 'smooth' } as const
+// The block is a 7×1.25 sliver — too short to carve precisely on a phone. We
+// zoom the view vertically (non-uniform) so the profile is a big finger
+// target; wheels are drawn as compensated ellipses so they still read round.
+// Gestures stay accurate because toInches() inverts the real getScreenCTM.
+const CARVE_VEXAG = 1.8
 
 export function CarveView() {
   const view = useGarageStore((s) => s.view)
@@ -45,6 +50,9 @@ export function CarveView() {
 
   const H = view === 'side' ? BLOCK.heightIn : BLOCK.widthIn
   const PAD = 0.45
+  // box aspect chosen so the non-uniform fill zooms the view vertically by
+  // exactly CARVE_VEXAG regardless of screen size
+  const boxAspect = (BLOCK.lengthIn + 2 * PAD) / (H + 2 * PAD) / CARVE_VEXAG
 
   /** pointer event → inch coords in profile space (y up from block bottom / centerline) */
   const toInches = (e: PointerEvent<SVGSVGElement>): [number, number] | null => {
@@ -142,11 +150,13 @@ export function CarveView() {
       <div className="lp-label" style={{ fontSize: '0.66rem', color: 'var(--navy)' }}>
         « nose — {view === 'side' ? 'side view' : 'top view · dashed boxes show where the wheels mount'}
       </div>
-    <div style={{ position: 'relative', flex: 1, minHeight: 0, display: 'flex' }}>
+    <div style={{ position: 'relative', flex: 1, minHeight: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <div style={{ position: 'relative', width: '100%', maxHeight: '100%', aspectRatio: String(boxAspect) }}>
     <svg
       ref={svgRef}
       viewBox={`${-PAD} ${-PAD} ${BLOCK.lengthIn + 2 * PAD} ${H + 2 * PAD}`}
-      style={{ width: '100%', flex: 1, minHeight: 0, touchAction: 'none', display: 'block' }}
+      preserveAspectRatio="none"
+      style={{ width: '100%', height: '100%', touchAction: 'none', display: 'block' }}
       onPointerDown={onDown}
       onPointerMove={onMove}
       onPointerUp={onUp}
@@ -189,10 +199,12 @@ export function CarveView() {
       {view === 'side' &&
         [AXLE_X_IN.front, AXLE_X_IN.rear].map((x) => (
           <g key={x} pointerEvents="none">
-            <circle
+            {/* ry shrunk by CARVE_VEXAG so the vertical zoom renders it round */}
+            <ellipse
               cx={x}
               cy={sy(AXLE_Y_IN)}
-              r={WHEEL_RADIUS_IN}
+              rx={WHEEL_RADIUS_IN}
+              ry={WHEEL_RADIUS_IN / CARVE_VEXAG}
               fill="var(--ink)"
               fillOpacity={0.06}
               stroke="var(--ink)"
@@ -200,7 +212,7 @@ export function CarveView() {
               strokeWidth={0.03}
               strokeDasharray="0.1 0.07"
             />
-            <circle cx={x} cy={sy(AXLE_Y_IN)} r={0.06} fill="var(--ink)" fillOpacity={0.8} />
+            <ellipse cx={x} cy={sy(AXLE_Y_IN)} rx={0.06} ry={0.06 / CARVE_VEXAG} fill="var(--ink)" fillOpacity={0.8} />
           </g>
         ))}
       {view === 'top' &&
@@ -307,6 +319,7 @@ export function CarveView() {
           </div>
         </div>
       )}
+    </div>
     </div>
     </div>
   )
