@@ -100,7 +100,7 @@ export function BlueprintScreen() {
               DERBY DASH SPEEDWAY
             </div>
             <div className="lp-label" style={{ fontSize: '0.62rem', color: 'var(--brick-red)' }}>
-              1:1 scale — print at 100%
+              1:1 scale — print landscape at 100%
             </div>
           </div>
         </div>
@@ -110,11 +110,13 @@ export function BlueprintScreen() {
               it never forces horizontal overflow; SVGs scale via maxWidth) */}
           <div style={{ flex: '1 1 600px', minWidth: 260, display: 'flex', flexDirection: 'column', gap: 6 }}>
             <Section step="1" title="Side view — cut this profile first" hint="band saw">
-              {/* width(mm) MUST equal viewBox width(units) for true 1:1 print scale */}
+              {/* width(mm) MUST equal viewBox width(units) for true 1:1 print scale;
+                  190mm survives letter & A4 portrait without shrinking (see print CSS).
+                  viewBox bottom reaches +24 so the mounted wheels aren't clipped. */}
               <svg
-                width="200mm"
-                height={`${mm(heightIn) + 30}mm`}
-                viewBox={`-9 ${-(mm(heightIn) + 16)} 200 ${mm(heightIn) + 30}`}
+                width="190mm"
+                height={`${mm(heightIn) + 40}mm`}
+                viewBox={`-6 ${-(mm(heightIn) + 16)} 190 ${mm(heightIn) + 40}`}
                 style={{ maxWidth: '100%', height: 'auto', display: 'block' }}
               >
                 {/* baseline (bottom of the block) */}
@@ -147,11 +149,13 @@ export function BlueprintScreen() {
             </Section>
 
             <Section step="2" title="Top view — then cut this one" hint="weights = drilled holes">
-              {/* width(mm) MUST equal viewBox width(units) for true 1:1 print scale */}
+              {/* width(mm) MUST equal viewBox width(units) for true 1:1 print scale;
+                  190mm portrait-safe; y-range ±24 so a full-width block (±22.2mm)
+                  isn't clipped. */}
               <svg
-                width="200mm"
-                height="48mm"
-                viewBox={`-9 -22 200 48`}
+                width="190mm"
+                height="50mm"
+                viewBox={`-6 -24 190 50`}
                 style={{ maxWidth: '100%', height: 'auto', display: 'block' }}
               >
                 <path d={topProfilePathMm(buffers)} fill="var(--pine)" fillOpacity={0.5} stroke="var(--ink)" strokeWidth={0.6} strokeLinejoin="round" className="bp-line" />
@@ -198,8 +202,8 @@ export function BlueprintScreen() {
                 {[0, 6.35, 12.7, 19.05, 25.4].map((x) => (
                   <line key={x} x1={2 + x} y1={2} x2={2 + x} y2={x % 12.7 === 0 ? 11 : 9} stroke="var(--ink)" strokeWidth={0.5} />
                 ))}
-                <text x={2} y={14} fontSize={2.4} fontFamily="Oswald, sans-serif" fontWeight={600}>
-                  this bar must be exactly 1 inch — else set print to 100%
+                <text x={2} y={14} fontSize={2.3} fontFamily="Oswald, sans-serif" fontWeight={600}>
+                  must be exactly 1 inch — print landscape, 100% (not Fit)
                 </text>
               </svg>
             </Section>
@@ -221,6 +225,9 @@ export function BlueprintScreen() {
                     ['Balance', `${derived.comXIn.toFixed(2)}″ from the nose — balance it there on a pencil`],
                     ['Polish', ['none — sand them!', 'fine sandpaper', 'wet-sand smooth', 'polish to a mirror'][design.wheels.polish]!],
                     ['Graphite', design.wheels.graphite === 0 ? 'none — add some!' : `${design.wheels.graphite} good puff${design.wheels.graphite > 1 ? 's' : ''} per axle`],
+                    // the printed outline is the sharp pre-round silhouette, so
+                    // disclose the fillet as a finishing step
+                    ['Edges', buffers.edgeRadius > 0.01 ? `round the 4 long edges to ~${buffers.edgeRadius.toFixed(2)}″` : 'keep the edges crisp'],
                   ].map(([k, v]) => (
                     <tr key={k}>
                       <td

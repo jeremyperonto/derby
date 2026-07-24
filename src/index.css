@@ -107,6 +107,13 @@
   .blueprint-sheet .bp-body {
     flex-direction: column !important;
   }
+  /* CRITICAL: the on-screen maxWidth:100% must NOT apply in print, or a narrow
+     portrait/A4 page would silently shrink the profile below 1:1 and undersize
+     the real cut. Force true physical mm width; the 190mm canvas fits letter &
+     A4 portrait, so nothing clips either. */
+  .blueprint-sheet svg {
+    max-width: none !important;
+  }
   .no-print {
     display: none !important;
   }

@@ -1,5 +1,6 @@
 import { lazy, Suspense } from 'react'
 import { Canvas } from '@react-three/fiber'
+import { AboutScreen } from './app/AboutScreen'
 import { TitleScreen } from './app/TitleScreen'
 import { TitleShowcase } from './app/TitleShowcase'
 import { BlueprintScreen } from './blueprint/BlueprintScreen'
@@ -7,6 +8,7 @@ import { PALETTE } from './content/palette'
 import { GarageScene } from './garage/GarageScene'
 import { GarageScreen } from './garage/GarageScreen'
 import { CameraRig } from './race/CameraRig'
+import { PreRaceCamera, PreRaceScreen } from './race/PreRaceScreen'
 import { RaceCars } from './race/RaceCars'
 import { RaceScreen } from './race/RaceScreen'
 import { RivalSelectScreen } from './race/RivalSelectScreen'
@@ -32,11 +34,13 @@ function SceneRouter() {
       <directionalLight position={[4, 8, 6]} intensity={1.2} />
       {(screen === 'title' || screen === 'tuning') && <TitleShowcase />}
       {screen === 'garage' && <GarageScene />}
-      {screen === 'race' && (
+      {(screen === 'preRace' || screen === 'race') && (
         <>
+          {/* TrackScene + RaceCars stay mounted across the line-up → race hand-off;
+              only the camera swaps (static staging vs. the finish choreography) */}
           <TrackScene />
           <RaceCars />
-          <CameraRig />
+          {screen === 'race' ? <CameraRig /> : <PreRaceCamera />}
         </>
       )}
       {screen === 'results' && <WinnersCircle />}
@@ -59,8 +63,10 @@ export default function App() {
       </Canvas>
 
       {screen === 'title' && <TitleScreen />}
+      {screen === 'about' && <AboutScreen />}
       {screen === 'garage' && <GarageScreen />}
       {screen === 'rivalSelect' && <RivalSelectScreen />}
+      {screen === 'preRace' && <PreRaceScreen />}
       {screen === 'race' && <RaceScreen />}
       {screen === 'results' && <ResultsScreen />}
       {screen === 'blueprint' && <BlueprintScreen />}

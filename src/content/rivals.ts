@@ -124,7 +124,7 @@ export const RIVALS: Rival[] = [
       ],
       { polish: 0, graphite: 0 },
     ),
-    unlocks: ['decal-eyes'],
+    unlocks: ['decal-eyes', 'decal-shield'],
   },
   {
     id: 'ned',
@@ -187,7 +187,7 @@ export const RIVALS: Rival[] = [
       ],
       { polish: 2, graphite: 1 },
     ),
-    unlocks: ['decal-wings'],
+    unlocks: ['decal-wings', 'decal-eight'],
   },
   {
     id: 'barb',
@@ -231,7 +231,7 @@ export const RIVALS: Rival[] = [
       ],
       { polish: 3, graphite: 2 },
     ),
-    unlocks: ['decal-crown'],
+    unlocks: ['decal-crown', 'decal-shark'],
   },
   {
     id: 'lena',

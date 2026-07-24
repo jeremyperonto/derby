@@ -6,26 +6,26 @@ import { LESSONS } from '../content/lessons'
 import { rivalById, RIVALS } from '../content/rivals'
 import { unlockById } from '../content/unlocks'
 import { medalDataURL } from '../garage/carDecals'
-import { AXLE_X_IN } from '../model/carDesign'
-import { deriveSimParams } from '../model/deriveSimParams'
 import { useAppStore } from '../state/appStore'
 import { useProgressStore } from '../state/progressStore'
 import { PLAYER_LANE, RIVAL_LANE, useRaceStore } from '../state/raceStore'
-import { bestTips, lengthsPhrase } from '../sim/feedback'
+import { bestTips, lengthsPhrase, type FeedbackTip } from '../sim/feedback'
 import { CAR_LENGTH_M } from '../sim/tuning'
 import { Btn } from '../ui/Btn'
-import { IconFlag, IconRematch, IconRuler, IconWrench, LessonIcon } from '../ui/icons'
+import { IconChevron, IconFlag, IconRematch, IconRuler, IconWrench, LessonIcon } from '../ui/icons'
 import { DiamondRule } from '../ui/ornaments'
+import { describeCar, SpecRow } from './carSpec'
 
-function SpecRow({ label, value }: { label: string; value: string }) {
-  return (
-    <>
-      <span className="lp-label" style={{ fontSize: '0.64rem', alignSelf: 'center', color: 'var(--navy)' }}>
-        {label}
-      </span>
-      <span style={{ fontFamily: 'var(--font-prose)', fontStyle: 'italic' }}>{value}</span>
-    </>
-  )
+/**
+ * The pit-crew tip sentence, always true: only claim "would have won it" when
+ * the variant actually beats the rival (reporting the true margin OVER the
+ * rival); otherwise say how much faster it would have been without a false win.
+ */
+function feedbackSentence(tip: FeedbackTip): string {
+  const L = LESSONS[tip.lesson]
+  return tip.wouldBeatRival
+    ? L.tipLine.replace('{gain}', lengthsPhrase(tip.marginOverRival))
+    : `You'd have been ${lengthsPhrase(tip.gainLengths)} faster — ${L.kidLine}`
 }
 
 export function ResultsScreen() {
@@ -83,9 +83,7 @@ export function ResultsScreen() {
       speak(`You won the heat — you beat ${outcome.rival.name}!`)
     } else {
       sfx.womp()
-      const line = outcome.tip
-        ? LESSONS[outcome.tip.lesson].tipLine.replace('{gain}', lengthsPhrase(outcome.tip.gainLengths))
-        : lesson.kidLine
+      const line = outcome.tip ? feedbackSentence(outcome.tip) : lesson.kidLine
       speak(`So close! Pit crew says: ${line}`)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -158,19 +156,6 @@ export function ResultsScreen() {
         {(() => {
           const winnerLane = raceData.order[0]!
           const winner = lanes[winnerLane]!
-          const spec = deriveSimParams(winner.design)
-          const { polish, graphite } = winner.design.wheels
-          const behindRearAxle = AXLE_X_IN.rear - spec.comXIn
-          const inZone = behindRearAxle >= 0.25 && behindRearAxle <= 1.5
-          const shape =
-            spec.params.dragCd <= 0.58
-              ? 'slippery as a fish'
-              : spec.params.dragCd <= 0.72
-                ? 'sleek and low'
-                : spec.params.dragCd <= 0.9
-                  ? 'a bit boxy'
-                  : 'a flying brick'
-          const POLISH_WORDS = ['rough', 'sanded', 'smooth', 'mirror']
           return (
             <>
               <div
@@ -213,20 +198,9 @@ export function ResultsScreen() {
                     fontSize: '0.86rem',
                   }}
                 >
-                  <SpecRow label="Weight" value={`${spec.totalOz.toFixed(1)} oz of 5${spec.totalOz >= 4.75 ? ' — loaded up!' : ''}`} />
-                  <SpecRow
-                    label="Balance"
-                    value={
-                      behindRearAxle >= 0
-                        ? `${behindRearAxle.toFixed(1)}″ ahead of the rear axle${inZone ? ' — heavy in the back!' : ''}`
-                        : 'behind the rear axle!'
-                    }
-                  />
-                  <SpecRow
-                    label="Axles"
-                    value={`${POLISH_WORDS[polish]} polish · ${graphite === 0 ? 'no' : graphite} puff${graphite === 1 ? '' : 's'} of graphite`}
-                  />
-                  <SpecRow label="Shape" value={shape} />
+                  {describeCar(winner.design).map((row) => (
+                    <SpecRow key={row.label} label={row.label} value={row.value} />
+                  ))}
                 </div>
               </fieldset>
             </>
@@ -298,9 +272,7 @@ export function ResultsScreen() {
               <LessonIcon id={lesson.icon} size={17} /> Pit crew says
             </div>
             <div style={{ fontFamily: 'var(--font-prose)', fontSize: '1.02rem', marginTop: 6, lineHeight: 1.4 }}>
-              {outcome.tip
-                ? LESSONS[outcome.tip.lesson].tipLine.replace('{gain}', lengthsPhrase(outcome.tip.gainLengths))
-                : lesson.kidLine}
+              {outcome.tip ? feedbackSentence(outcome.tip) : lesson.kidLine}
             </div>
             <button
               onClick={() => setShowNotes((v) => !v)}
@@ -312,9 +284,13 @@ export function ResultsScreen() {
                 textDecoration: 'underline',
                 textUnderlineOffset: 3,
                 cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 5,
               }}
             >
-              Pit Crew Notes for grown-ups {showNotes ? '▲' : '▼'}
+              Pit Crew Notes for grown-ups
+              <IconChevron size={13} style={{ transform: showNotes ? 'rotate(180deg)' : undefined }} />
             </button>
             {showNotes && (
               <div style={{ marginTop: 8, fontFamily: 'var(--font-prose)', fontSize: '0.95rem', lineHeight: 1.5 }}>

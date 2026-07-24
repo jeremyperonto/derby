@@ -119,6 +119,10 @@ export function CarBody({
 
   const bodyColor = PALETTE[design.paint.body] ?? PALETTE.brickRed
   const wheelColor = PALETTE[design.paint.wheels] ?? PALETTE.ink
+  // optional two-tone accent: colors the wheel hubs (and number-plate ring);
+  // undefined keeps the original paper hub / ink ring look
+  const accentColor = design.paint.accent ? PALETTE[design.paint.accent] : undefined
+  const hubColor = accentColor ?? PALETTE.paper
 
   const wheels = useMemo(() => {
     const out: { x: number; z: number }[] = []
@@ -149,10 +153,10 @@ export function CarBody({
             <cylinderGeometry args={[WHEEL_RADIUS_IN, WHEEL_RADIUS_IN, WHEEL_WIDTH_IN, 14]} />
             <meshStandardMaterial color={wheelColor} flatShading roughness={0.9} />
           </mesh>
-          {/* hub dot makes the spin visible */}
+          {/* hub dot makes the spin visible; picks up the accent trim color */}
           <mesh position={[WHEEL_RADIUS_IN * 0.55, 0, 0]} rotation={[Math.PI / 2, 0, 0]}>
             <cylinderGeometry args={[0.09, 0.09, WHEEL_WIDTH_IN + 0.02, 8]} />
-            <meshStandardMaterial color={PALETTE.paper} flatShading />
+            <meshStandardMaterial color={hubColor} flatShading />
           </mesh>
         </group>
       ))}
@@ -187,7 +191,8 @@ export function CarBody({
 const yTopAt = (buffers: CarveBuffers, x: number) => buffers.yTop[idxAt(x)]!
 
 function NumberPlates({ design, buffers }: { design: CarDesign; buffers: CarveBuffers }) {
-  const texture = numberTexture(design.number)
+  const ring = design.paint.accent ? PALETTE[design.paint.accent] ?? PALETTE.ink : PALETTE.ink
+  const texture = numberTexture(design.number, ring)
   const geometries = useMemo(() => {
     // the roundel lives on the "door" (mid-car); within that small window
     // nudge toward the tallest flank so it sizes up, but never wander to the

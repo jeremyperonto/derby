@@ -26,10 +26,13 @@ export const UNLOCKS: Unlock[] = [
   { id: 'decal-wings', kind: 'decal', itemId: 'wings', label: 'Racing wings sticker' },
   { id: 'decal-crown', kind: 'decal', itemId: 'crown', label: 'Crown sticker' },
   { id: 'decal-trophy', kind: 'decal', itemId: 'trophy', label: 'Champion’s trophy sticker' },
+  { id: 'decal-shield', kind: 'decal', itemId: 'shield', label: 'Shield sticker' },
+  { id: 'decal-eight', kind: 'decal', itemId: 'eight', label: 'Eight-ball sticker' },
+  { id: 'decal-shark', kind: 'decal', itemId: 'shark', label: 'Shark-teeth sticker' },
 ]
 
 /** paints/decals available before any wins */
 export const BASE_PAINTS: PaletteId[] = ['brickRed', 'navy', 'skyBlue']
-export const BASE_DECALS = ['flame', 'bolt', 'star', 'heart']
+export const BASE_DECALS = ['flame', 'bolt', 'star', 'heart', 'sun', 'diamond']
 
 export const unlockById = (id: string) => UNLOCKS.find((u) => u.id === id)

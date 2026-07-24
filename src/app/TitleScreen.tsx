@@ -2,12 +2,12 @@ import { useAppStore } from '../state/appStore'
 import { useProgressStore } from '../state/progressStore'
 import { useSettingsStore } from '../state/settingsStore'
 import { Btn } from '../ui/Btn'
-import { IconFlag, IconSound, IconSoundOff, IconVoice, IconWrench } from '../ui/icons'
+import { IconFlag, IconInfo, IconSound, IconSoundOff, IconVoice, IconWrench } from '../ui/icons'
 import { CrossedFlags, DiamondRule, EstPlaque, SpeedRules } from '../ui/ornaments'
 
 /**
  * Title screen: a one-ink badge lockup straight from the reference posters
- * (crossed checkered flags, arched letterspaced line, big Rye display,
+ * (crossed checkered flags, arched letterspaced line, big Anton display,
  * script tagline, speed rules) over the rotating car showcase.
  */
 export function TitleScreen() {
@@ -106,6 +106,32 @@ export function TitleScreen() {
 
       <div style={{ paddingBottom: 16, color: 'var(--ink)' }}>
         <DiamondRule width={230} />
+      </div>
+
+      {/* about + home link, bottom-left */}
+      <div
+        style={{
+          position: 'absolute',
+          left: 14,
+          bottom: 14,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 10,
+          pointerEvents: 'auto',
+        }}
+      >
+        <Btn size="sm" onClick={() => setScreen('about')} title="about Derby Dash">
+          <IconInfo size={18} />
+        </Btn>
+        <a
+          href="https://jeremyperonto.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          title="jeremyperonto.com"
+          style={{ textDecoration: 'none', color: 'var(--ink)' }}
+        >
+          <EstPlaque>jeremyperonto.com</EstPlaque>
+        </a>
       </div>
 
       {/* settings corner */}

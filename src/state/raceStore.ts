@@ -51,6 +51,11 @@ interface RaceState {
   /** top two finishers within 60 ms — trigger the slow-mo photo finish */
   photoFinish: boolean
 
+  /** assemble the field + run the sim, then hold at the gate (no navigation) */
+  prepareField: (player: CarDesign, rivalId: string) => void
+  /** release the pre-computed race: go to the race screen and let it play */
+  beginRace: () => void
+  /** prepareField + beginRace in one call (used by rematch's fast retry) */
   startRace: (player: CarDesign, rivalId: string) => void
   rematch: () => void
   freezeFrame: () => void
@@ -86,7 +91,7 @@ export const useRaceStore = create<RaceState>((set, get) => ({
   rivalId: null,
   photoFinish: false,
 
-  startRace: (player, rivalId) => {
+  prepareField: (player, rivalId) => {
     const rival = rivalById(rivalId)
     if (!rival) return
     const attempt = get().attempt + 1
@@ -111,6 +116,8 @@ export const useRaceStore = create<RaceState>((set, get) => ({
     const raceData = runRace(laneParams, seed)
     const sorted = raceData.lanes.map((l) => l.finishTime).sort((a, b) => a - b)
     const photoFinish = Number.isFinite(sorted[1]!) && sorted[1]! - sorted[0]! < 0.06
+    // held at the gate: clock parked at the ceremony start, not yet playing —
+    // the pre-race line-up stages the cars here until the kid taps GO
     set({
       lanes,
       laneParams,
@@ -120,7 +127,7 @@ export const useRaceStore = create<RaceState>((set, get) => ({
       photoFinish,
       playback: {
         t: -GATE_CEREMONY_S,
-        playing: true,
+        playing: false,
         timeScale: 1,
         phase: 'live',
         replayed: false,
@@ -128,7 +135,17 @@ export const useRaceStore = create<RaceState>((set, get) => ({
         finished: false,
       },
     })
+  },
+
+  beginRace: () => {
+    set({ playback: { ...get().playback, playing: true } })
     useAppStore.getState().setScreen('race')
+  },
+
+  startRace: (player, rivalId) => {
+    if (!rivalById(rivalId)) return
+    get().prepareField(player, rivalId)
+    get().beginRace()
   },
 
   rematch: () => {
