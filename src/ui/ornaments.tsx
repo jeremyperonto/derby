@@ -128,3 +128,30 @@ export function EstPlaque({ children }: { children: React.ReactNode }) {
     </span>
   )
 }
+
+/**
+ * Upper-right home affordance — a plaque that links out to the author's site.
+ * Fixed in the top-right corner above screen content; use it as the single
+ * consistent "back to jeremyperonto.com" mark across screens.
+ */
+export function HomeBadge() {
+  return (
+    <a
+      href="https://jeremyperonto.com"
+      target="_blank"
+      rel="noopener noreferrer"
+      title="jeremyperonto.com"
+      style={{
+        position: 'absolute',
+        top: 14,
+        right: 14,
+        zIndex: 20,
+        textDecoration: 'none',
+        color: 'var(--ink)',
+        pointerEvents: 'auto',
+      }}
+    >
+      <EstPlaque>jeremyperonto.com</EstPlaque>
+    </a>
+  )
+}

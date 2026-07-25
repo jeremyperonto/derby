@@ -36,6 +36,10 @@ npm run test     # physics + carve test suite
 npm run build    # production build to dist/
 ```
 
+## Suggest an improvement
+
+Found a bug, or want Derby Dash to do something it can't yet? Open the About screen (the info button on the title screen) and use **Suggest an improvement** — it opens a prefilled GitHub issue, or copies a prompt you can hand to your own AI. You can also [open an issue directly](https://github.com/jeremyperonto/derby/issues) or email jeremy@peronto.com.
+
 ## Credits
 
 Built by [Jeremy Peronto](https://jeremyperonto.com) with his son — chief playtester, art director, and reason for being.
