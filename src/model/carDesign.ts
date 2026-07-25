@@ -114,6 +114,9 @@ export const carDesignSchema = z.object({
   wheels: wheelSetupSchema,
   paint: z.object({
     body: paletteId,
+    // optional two-tone trim (number ring + wheel hubs). Additive & optional,
+    // so old saves parse and new saves round-trip without a schemaVersion bump
+    // or migration — undefined just renders the original single-tone look.
     accent: paletteId.optional(),
     wheels: paletteId,
   }),

@@ -31,16 +31,16 @@ function makeTexture(key: string, draw: Draw): CanvasTexture {
   return texture
 }
 
-/** classic painted roundel: paper circle, ink ring, big ink number */
-export function numberTexture(n: number): CanvasTexture {
-  return makeTexture(`num:${n}`, (ctx, s) => {
+/** classic painted roundel: paper circle, accent ring (ink by default), big ink number */
+export function numberTexture(n: number, ring: string = PALETTE.ink): CanvasTexture {
+  return makeTexture(`num:${n}:${ring}`, (ctx, s) => {
     ctx.clearRect(0, 0, s, s)
     ctx.beginPath()
     ctx.arc(s / 2, s / 2, s * 0.46, 0, Math.PI * 2)
     ctx.fillStyle = PALETTE.paper
     ctx.fill()
-    ctx.lineWidth = s * 0.05
-    ctx.strokeStyle = PALETTE.ink
+    ctx.lineWidth = s * 0.07
+    ctx.strokeStyle = ring
     ctx.stroke()
     ctx.fillStyle = PALETTE.ink
     ctx.font = `600 ${s * 0.5}px Oswald, 'Arial Narrow', sans-serif`
@@ -287,6 +287,109 @@ const STICKER_DRAWS: Record<string, Draw> = {
     ctx.closePath()
     ctx.fill()
     outline(ctx, s)
+  },
+  sun: (ctx, s) => {
+    // triangular rays around an orange disc
+    ctx.fillStyle = PALETTE.mustard
+    for (let i = 0; i < 12; i++) {
+      const a = (i * Math.PI) / 6
+      ctx.beginPath()
+      ctx.moveTo(s / 2 + Math.cos(a) * s * 0.28, s / 2 + Math.sin(a) * s * 0.28)
+      ctx.lineTo(s / 2 + Math.cos(a - 0.13) * s * 0.47, s / 2 + Math.sin(a - 0.13) * s * 0.47)
+      ctx.lineTo(s / 2 + Math.cos(a + 0.13) * s * 0.47, s / 2 + Math.sin(a + 0.13) * s * 0.47)
+      ctx.closePath()
+      ctx.fill()
+    }
+    ctx.beginPath()
+    ctx.arc(s / 2, s / 2, s * 0.26, 0, Math.PI * 2)
+    ctx.fillStyle = PALETTE.orange
+    ctx.fill()
+    outline(ctx, s)
+  },
+  diamond: (ctx, s) => {
+    ctx.beginPath()
+    ctx.moveTo(s * 0.5, s * 0.14)
+    ctx.lineTo(s * 0.82, s * 0.42)
+    ctx.lineTo(s * 0.5, s * 0.88)
+    ctx.lineTo(s * 0.18, s * 0.42)
+    ctx.closePath()
+    ctx.fillStyle = PALETTE.skyBlue
+    ctx.fill()
+    outline(ctx, s)
+    // facets
+    ctx.beginPath()
+    ctx.moveTo(s * 0.18, s * 0.42)
+    ctx.lineTo(s * 0.82, s * 0.42)
+    ctx.moveTo(s * 0.5, s * 0.14)
+    ctx.lineTo(s * 0.36, s * 0.42)
+    ctx.lineTo(s * 0.5, s * 0.88)
+    ctx.moveTo(s * 0.5, s * 0.14)
+    ctx.lineTo(s * 0.64, s * 0.42)
+    ctx.lineTo(s * 0.5, s * 0.88)
+    ctx.lineWidth = s * 0.03
+    ctx.strokeStyle = PALETTE.navy
+    ctx.stroke()
+  },
+  shield: (ctx, s) => {
+    ctx.beginPath()
+    ctx.moveTo(s * 0.5, s * 0.12)
+    ctx.lineTo(s * 0.82, s * 0.24)
+    ctx.lineTo(s * 0.82, s * 0.54)
+    ctx.quadraticCurveTo(s * 0.8, s * 0.82, s * 0.5, s * 0.92)
+    ctx.quadraticCurveTo(s * 0.2, s * 0.82, s * 0.18, s * 0.54)
+    ctx.lineTo(s * 0.18, s * 0.24)
+    ctx.closePath()
+    ctx.fillStyle = PALETTE.navy
+    ctx.fill()
+    // band, clipped to the shield
+    ctx.save()
+    ctx.clip()
+    ctx.fillStyle = PALETTE.mustard
+    ctx.fillRect(s * 0.1, s * 0.44, s * 0.8, s * 0.14)
+    ctx.restore()
+    outline(ctx, s)
+  },
+  eight: (ctx, s) => {
+    ctx.beginPath()
+    ctx.arc(s / 2, s / 2, s * 0.42, 0, Math.PI * 2)
+    ctx.fillStyle = PALETTE.ink
+    ctx.fill()
+    ctx.beginPath()
+    ctx.arc(s / 2, s * 0.47, s * 0.2, 0, Math.PI * 2)
+    ctx.fillStyle = PALETTE.paper
+    ctx.fill()
+    ctx.fillStyle = PALETTE.ink
+    ctx.font = `700 ${s * 0.28}px Oswald, 'Arial Narrow', sans-serif`
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    ctx.fillText('8', s / 2, s * 0.49)
+  },
+  shark: (ctx, s) => {
+    // toothy grin — red mouth with white teeth
+    ctx.beginPath()
+    ctx.ellipse(s * 0.5, s * 0.5, s * 0.4, s * 0.32, 0, 0, Math.PI * 2)
+    ctx.fillStyle = PALETTE.brickRed
+    ctx.fill()
+    outline(ctx, s)
+    ctx.fillStyle = PALETTE.paper
+    const teeth = 5
+    const span = s * 0.6
+    const w = span / teeth
+    for (let i = 0; i < teeth; i++) {
+      const x0 = s * 0.2 + i * w
+      ctx.beginPath() // upper row, points down to center
+      ctx.moveTo(x0, s * 0.4)
+      ctx.lineTo(x0 + w, s * 0.4)
+      ctx.lineTo(x0 + w / 2, s * 0.5)
+      ctx.closePath()
+      ctx.fill()
+      ctx.beginPath() // lower row, points up to center
+      ctx.moveTo(x0, s * 0.6)
+      ctx.lineTo(x0 + w, s * 0.6)
+      ctx.lineTo(x0 + w / 2, s * 0.5)
+      ctx.closePath()
+      ctx.fill()
+    }
   },
 }
 

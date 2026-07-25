@@ -50,7 +50,10 @@ export function CameraRig() {
   useFrame((_, delta) => {
     const { raceData, playback, track, photoFinish, freezeFrame, startReplay, finishPlayback } =
       useRaceStore.getState()
-    if (!raceData || playback.finished) return
+    // `playing` is the gate: it stays false through the pre-race line-up (held
+    // at the gate) and flips true in beginRace, so the clock only advances once
+    // the kid taps GO — even if this rig is ever mounted during staging.
+    if (!raceData || playback.finished || !playback.playing) return
 
     const finishTimes = raceData.lanes.map((l) => l.finishTime)
     const winnerTime = Math.min(...finishTimes)

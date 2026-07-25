@@ -27,6 +27,8 @@ export interface FeedbackTip {
   gainLengths: number
   /** would the variant have beaten the target rival? */
   wouldBeatRival: boolean
+  /** car lengths the variant would have finished ahead of the RIVAL (the true winning margin) */
+  marginOverRival: number
 }
 
 interface Variant {
@@ -34,7 +36,21 @@ interface Variant {
   build: (design: CarDesign) => CarDesign | null // null = not applicable
 }
 
-const REAR_SLOTS = [6, 5, 7, 8, 4] // rearmost first
+// rearmost first BY TRUE X: 7,8 are the rear-bumper slots (x=6.8), then 6 (6.45)…
+// so "move the weights back" actually reaches the furthest-back holes.
+const REAR_SLOTS = [7, 8, 6, 5, 4]
+
+/** a plain wedge — the counterfactual for a still-uncarved block */
+const WEDGE_OPS: CarveOp[] = [
+  { t: 'slice', view: 'side', ax: 0, ay: 0.3, bx: 7, by: 1.2 },
+  { t: 'round', r: 0.12 },
+]
+/** an aggressively sleek body — low deck + slim nose — the real aero win */
+const SLEEK_OPS: CarveOp[] = [
+  { t: 'slice', view: 'side', ax: 0, ay: 0.28, bx: 7, by: 0.62 },
+  { t: 'slice', view: 'top', ax: 0, ay: 0.48, bx: 7, by: 0.875 },
+  { t: 'round', r: 0.12 },
+]
 
 /** move every existing plug to the rearmost open slots */
 function moveWeightsBack(design: CarDesign): CarDesign | null {
@@ -83,13 +99,18 @@ const VARIANTS: Variant[] = [
         : { ...design, wheels: { ...design.wheels, polish: 3, graphite: 3 } },
   },
   {
+    // a still-uncarved block: teach carving it into a car at all
+    lesson: 'carve',
+    build: (design) =>
+      design.carve.ops.length === 0 ? { ...design, carve: { ops: [...WEDGE_OPS] } } : null,
+  },
+  {
+    // already carved but not sleek: teach an aggressively lower, slimmer body
     lesson: 'aero',
-    build: (design) => {
-      // counterfactual sleeker body: add a wedge slice over whatever they carved
-      const wedge: CarveOp = { t: 'slice', view: 'side', ax: 0, ay: 0.35, bx: 7, by: 1.15 }
-      const round: CarveOp = { t: 'round', r: 0.15 }
-      return { ...design, carve: { ops: [...design.carve.ops, wedge, round] } }
-    },
+    build: (design) =>
+      design.carve.ops.length === 0
+        ? null
+        : { ...design, carve: { ops: [...design.carve.ops, ...SLEEK_OPS] } },
   },
 ]
 
@@ -122,11 +143,17 @@ export function bestTips(
     const newTime = race.lanes[playerLane]!.finishTime
     const gainS = actualTime - newTime
     if (gainS <= 0.001) continue
+    const gainLengths = (gainS * speed) / CAR_LENGTH_M
+    const wouldBeatRival = newTime < rivalTime
+    // drop noise-level tips that don't even flip the result — a "would've won
+    // by a nose" that wouldn't have won breaks the "always true" promise
+    if (gainLengths < 0.25 && !wouldBeatRival) continue
     tips.push({
       lesson: variant.lesson,
       gainS,
-      gainLengths: (gainS * speed) / CAR_LENGTH_M,
-      wouldBeatRival: newTime < rivalTime,
+      gainLengths,
+      wouldBeatRival,
+      marginOverRival: ((rivalTime - newTime) * speed) / CAR_LENGTH_M,
     })
   }
 

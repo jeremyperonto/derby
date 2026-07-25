@@ -105,7 +105,8 @@ export function RivalSelectScreen() {
 function RivalCard({ rival, unlocked, beaten }: { rival: Rival; unlocked: boolean; beaten: boolean }) {
   const design = useGarageStore((s) => s.design)
   const gold = useProgressStore((s) => s.gold)
-  const startRace = useRaceStore((s) => s.startRace)
+  const prepareField = useRaceStore((s) => s.prepareField)
+  const setScreen = useAppStore((s) => s.setScreen)
   const lesson = LESSONS[rival.lesson]
 
   return (
@@ -119,6 +120,11 @@ function RivalCard({ rival, unlocked, beaten }: { rival: Rival; unlocked: boolea
         display: 'flex',
         flexDirection: 'column',
         gap: 8,
+        // uniform boxes: every card fills its grid row (stretch) with a common
+        // floor, and locked cards center their lone header so the grid reads evenly
+        height: '100%',
+        minHeight: 288,
+        justifyContent: unlocked ? 'flex-start' : 'center',
         opacity: unlocked ? 1 : 0.45,
       }}
     >
@@ -144,7 +150,7 @@ function RivalCard({ rival, unlocked, beaten }: { rival: Rival; unlocked: boolea
             <MiniProfile design={rival.design} />
           </div>
 
-          <div style={{ fontFamily: 'var(--font-prose)', fontSize: '0.92rem', fontStyle: 'italic', lineHeight: 1.35 }}>
+          <div style={{ fontFamily: 'var(--font-prose)', fontSize: '0.92rem', fontStyle: 'italic', lineHeight: 1.35, minHeight: '3.7em' }}>
             {rival.intro}
           </div>
 
@@ -163,7 +169,14 @@ function RivalCard({ rival, unlocked, beaten }: { rival: Rival; unlocked: boolea
             <LessonIcon id={lesson.icon} size={15} /> Lesson: {lesson.title}
           </div>
 
-          <Btn variant="red" onClick={() => startRace(design, rival.id)}>
+          <Btn
+            variant="red"
+            onClick={() => {
+              prepareField(design, rival.id)
+              setScreen('preRace')
+            }}
+            style={{ marginTop: 'auto' }}
+          >
             <IconFlag size={17} /> {beaten ? 'Rematch' : 'Race'}
           </Btn>
         </>

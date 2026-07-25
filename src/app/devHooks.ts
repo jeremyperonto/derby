@@ -6,6 +6,7 @@
  *   ?screen=garage            jump straight to a screen
  *   ?carve=wedge              apply a starter template on boot
  *   ?race=1                   start a practice race on boot
+ *   ?prerace=paula            stage the pre-race line-up vs a rival on boot
  *   ?snap=name[&snapdelay=ms] capture the canvas after a delay and POST it
  *                             to http://localhost:5198/?name=<name>
  *   ?snap=a@1000,b@4000       multiple timed captures
@@ -72,6 +73,16 @@ export function installDevHooks(): void {
       useRaceStore
         .getState()
         .startRace(useGarageStore.getState().design, rivalId === '1' ? 'bobby' : rivalId)
+    }
+    if (params.has('prerace')) {
+      const [{ useGarageStore }, { useRaceStore }, { useAppStore }] = await Promise.all([
+        import('../state/garageStore'),
+        import('../state/raceStore'),
+        import('../state/appStore'),
+      ])
+      const rivalId = params.get('prerace') || 'bobby'
+      useRaceStore.getState().prepareField(useGarageStore.getState().design, rivalId)
+      useAppStore.getState().setScreen('preRace')
     }
   }, 50)
 

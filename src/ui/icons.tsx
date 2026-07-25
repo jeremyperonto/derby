@@ -268,6 +268,31 @@ export const IconCamera = (p: IconProps) => (
   </I>
 )
 
+/** chevron — expand/collapse (rotate 180° for up) */
+export const IconChevron = (p: IconProps) => (
+  <I {...p}>
+    <path d="M6 9l6 6 6-6" />
+  </I>
+)
+
+/** padlock — locked cosmetic */
+export const IconLock = (p: IconProps) => (
+  <I {...p}>
+    <rect x={5} y={11} width={14} height={9} rx={1.5} />
+    <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+    <path d="M12 14.5v2.5" strokeWidth={1.6} />
+  </I>
+)
+
+/** info — about screen */
+export const IconInfo = (p: IconProps) => (
+  <I {...p}>
+    <circle cx={12} cy={12} r={9} />
+    <path d="M12 11v5" />
+    <circle cx={12} cy={7.7} r={1} fill="currentColor" stroke="none" />
+  </I>
+)
+
 /** lesson id → icon component (content stays React-free) */
 export const LESSON_ICONS = {
   saw: IconSaw,

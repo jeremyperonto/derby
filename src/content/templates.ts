@@ -63,4 +63,24 @@ export const TEMPLATES: Template[] = [
       { t: 'round', r: 0.15 },
     ],
   },
+  {
+    id: 'lowboy',
+    name: 'Lowboy',
+    ops: [
+      // slammed flat dragster — very low deck, slim needle nose
+      { t: 'slice', view: 'side', ax: 0, ay: 0.22, bx: 7, by: 0.5 },
+      { t: 'slice', view: 'top', ax: 0, ay: 0.42, bx: 7, by: 0.75 },
+      { t: 'round', r: 0.1 },
+    ],
+  },
+  {
+    id: 'fastback',
+    name: 'Fastback',
+    ops: [
+      // coupe: nose ramps up to a high shoulder, roofline slopes to a kicked tail
+      { t: 'slice', view: 'side', ax: 0, ay: 0.3, bx: 3.2, by: 1.05 },
+      { t: 'slice', view: 'side', ax: 3.2, ay: 1.05, bx: 7, by: 0.72 },
+      { t: 'round', r: 0.2 },
+    ],
+  },
 ]

@@ -10,6 +10,33 @@ const HOLD_S = 3.4
 const SWAP_S = 0.4
 
 /**
+ * Fresh random order each time the title mounts, then nudge any two cars that
+ * share a silhouette apart so identical shapes never sit back-to-back on the
+ * turntable. View layer — Math.random is fine here (nothing in sim depends on it).
+ */
+function shuffledShowcase() {
+  const arr = [...SHOWCASE_CARS]
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    const tmp = arr[i]!
+    arr[i] = arr[j]!
+    arr[j] = tmp
+  }
+  for (let i = 1; i < arr.length; i++) {
+    const prev = arr[i - 1]!
+    if (arr[i]!.carve.ops === prev.carve.ops) {
+      const k = arr.findIndex((c, idx) => idx > i && c.carve.ops !== prev.carve.ops)
+      if (k !== -1) {
+        const tmp = arr[i]!
+        arr[i] = arr[k]!
+        arr[k] = tmp
+      }
+    }
+  }
+  return arr
+}
+
+/**
  * Title-screen turntable: cycles through the showcase cars, squashing down
  * and popping back up between swaps while it slowly rotates.
  */
@@ -20,7 +47,7 @@ export function TitleShowcase() {
   const clock = useRef(0)
 
   const cars = useMemo(
-    () => SHOWCASE_CARS.map((design) => ({ design, buffers: replayOps(design.carve.ops) })),
+    () => shuffledShowcase().map((design) => ({ design, buffers: replayOps(design.carve.ops) })),
     [],
   )
   const car = cars[index % cars.length]!
