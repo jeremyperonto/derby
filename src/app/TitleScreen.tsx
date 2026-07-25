@@ -3,7 +3,7 @@ import { useProgressStore } from '../state/progressStore'
 import { useSettingsStore } from '../state/settingsStore'
 import { Btn } from '../ui/Btn'
 import { IconFlag, IconInfo, IconSound, IconSoundOff, IconVoice, IconWrench } from '../ui/icons'
-import { CrossedFlags, DiamondRule, EstPlaque, SpeedRules } from '../ui/ornaments'
+import { CrossedFlags, DiamondRule, EstPlaque, HomeBadge, SpeedRules } from '../ui/ornaments'
 
 /**
  * Title screen: a one-ink badge lockup straight from the reference posters
@@ -29,6 +29,8 @@ export function TitleScreen() {
         color: 'var(--ink)',
       }}
     >
+      <HomeBadge />
+
       {/* badge lockup */}
       <div
         style={{
@@ -108,7 +110,7 @@ export function TitleScreen() {
         <DiamondRule width={230} />
       </div>
 
-      {/* about + home link, bottom-left */}
+      {/* about, bottom-left */}
       <div
         style={{
           position: 'absolute',
@@ -123,15 +125,6 @@ export function TitleScreen() {
         <Btn size="sm" onClick={() => setScreen('about')} title="about Derby Dash">
           <IconInfo size={18} />
         </Btn>
-        <a
-          href="https://jeremyperonto.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          title="jeremyperonto.com"
-          style={{ textDecoration: 'none', color: 'var(--ink)' }}
-        >
-          <EstPlaque>jeremyperonto.com</EstPlaque>
-        </a>
       </div>
 
       {/* settings corner */}
