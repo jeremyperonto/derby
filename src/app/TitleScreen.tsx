@@ -31,13 +31,14 @@ export function TitleScreen() {
     >
       <HomeBadge />
 
-      {/* badge lockup */}
+      {/* badge lockup — the home strip above is ~34px tall, so subtract it
+          from the old 4.5vh top offset to keep the lockup where it was */}
       <div
         style={{
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          paddingTop: '4.5vh',
+          paddingTop: 'max(0px, calc(4.5vh - 34px))',
           gap: 4,
         }}
       >

@@ -3,7 +3,7 @@ import { useAppStore } from '../state/appStore'
 import { Btn } from '../ui/Btn'
 import { Seg } from '../ui/Fieldset'
 import { IconArrowLeft, IconCopy } from '../ui/icons'
-import { CrossedFlags, DiamondRule, HomeBadge, SpeedRules } from '../ui/ornaments'
+import { CrossedFlags, DiamondRule, HomeLink, SpeedRules } from '../ui/ornaments'
 import { SuggestSection } from './SuggestSection'
 
 /** what Derby Dash is, in plain words — shared by the card and the markdown mirror */
@@ -81,10 +81,8 @@ export function AboutScreen() {
         color: 'var(--ink)',
       }}
     >
-      <HomeBadge />
-
-      {/* top bar: back to title + human/agent view toggle */}
-      <div style={{ alignSelf: 'flex-start', display: 'flex', alignItems: 'center', gap: 10 }}>
+      {/* top bar, apex-style: back + human/agent toggle left, home link right */}
+      <div style={{ alignSelf: 'stretch', display: 'flex', alignItems: 'center', gap: 10 }}>
         <Btn size="md" onClick={() => setScreen('title')} title="back to the title">
           <IconArrowLeft size={18} />
         </Btn>
@@ -96,6 +94,9 @@ export function AboutScreen() {
             { value: 'agent', label: 'agent' },
           ]}
         />
+        <div style={{ marginLeft: 'auto' }}>
+          <HomeLink />
+        </div>
       </div>
 
       {view === 'human' ? (

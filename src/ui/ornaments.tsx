@@ -130,21 +130,17 @@ export function EstPlaque({ children }: { children: React.ReactNode }) {
 }
 
 /**
- * Upper-right home affordance — the standard cross-project back link:
- * "jeremyperonto.com →" pinned 24px from the right edge, 22px down, in a
- * system mono stack so it reads as site chrome rather than game type. Color
- * rides var(--ink) so it adapts to the paper background. Keep in sync with
- * jeremyperonto.com pages.
+ * The standard cross-project back link: "jeremyperonto.com →" in a system
+ * mono stack so it reads as site chrome rather than game type. Color rides
+ * var(--ink) so it adapts to the paper background. Keep in sync with
+ * jeremyperonto.com pages. Bare link, for embedding in an existing top bar
+ * (toggle left, link right — the apex .topbar arrangement).
  */
-export function HomeBadge() {
+export function HomeLink() {
   return (
     <a
       href="https://jeremyperonto.com"
       style={{
-        position: 'absolute',
-        top: 22,
-        right: 24,
-        zIndex: 20,
         textDecoration: 'none',
         color: 'var(--ink)',
         fontFamily: "ui-monospace, 'SF Mono', Menlo, monospace",
@@ -155,5 +151,28 @@ export function HomeBadge() {
     >
       jeremyperonto.com →
     </a>
+  )
+}
+
+/**
+ * Upper-right home affordance for screens without a top bar: the HomeLink
+ * in its own full-width strip, 22px down and 24px from the right edge —
+ * the same spot as the old absolute pin, but in flow so it can never sit
+ * on the badge lockup at narrow widths.
+ */
+export function HomeBadge() {
+  return (
+    <div
+      style={{
+        width: '100%',
+        boxSizing: 'border-box',
+        display: 'flex',
+        justifyContent: 'flex-end',
+        padding: '22px 24px 0',
+        flexShrink: 0,
+      }}
+    >
+      <HomeLink />
+    </div>
   )
 }
