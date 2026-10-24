@@ -1,4 +1,4 @@
-# CLAUDE.md — Derby Dash
+# AGENTS.md — Derby Dash
 
 Pinewood Derby simulator web game for a 6-year-old. Read `design.md` for the full game design; this file is the engineering contract.
 
@@ -166,7 +166,7 @@ GitHub Pages project site under the user site's custom domain → `https://jerem
 
 ## Site conventions (shared across jeremyperonto.com projects)
 
-From the main site's CLAUDE.md ("Cross-project conventions"), implemented here in the letterpress idiom:
+From the main site's AGENTS.md ("Cross-project conventions"), implemented here in the letterpress idiom:
 - **Home affordance, upper right.** `ui/ornaments.tsx` `HomeBadge` links to jeremyperonto.com from the top-right of the Title and About screens. Non-site branding (the "made by Jeremy" colophon, the EST plaque) lives in the About screen, not the header.
 - **About screen** (`app/AboutScreen.tsx`) carries the human/agent toggle (`Seg`). The agent view is `aboutMarkdown()` as copyable markdown, AI-safety note first. Game screens (garage/race/results) have no toggle by design.
 - **Suggest an improvement** (`app/SuggestSection.tsx`, on the About screen): textarea + optional name. "Suggest an improvement →" opens a prefilled issue at `github.com/jeremyperonto/derby`; "Copy as a prompt for your own AI" copies a clone-and-edit prompt; email fallback `jeremy@peronto.com`.
